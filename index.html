@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>อธิบายโค้ด MiniTest</title>
+<meta name="description" content="อธิบายโค้ดโปรเจกต์ MiniTest (CBT &amp; BST's Performance) แบบละเอียด พร้อมโค้ดทั้งหมด">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b3d91'/%3E%3Ccircle cx='16' cy='9' r='4' fill='white'/%3E%3Ccircle cx='9' cy='23' r='4' fill='white'/%3E%3Ccircle cx='23' cy='23' r='4' fill='white'/%3E%3Cpath d='M16 12L9 20M16 12L23 20' stroke='white' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--fg:#1b1f24;--muted:#5a6572;--brand:#0b3d91;--brand2:#d6001c;--card:#f6f8fa;--line:#d5dbe3;--th:#dfe8f7;--codebg:#f6f8fa;--inl:#eef1f6;--inlfg:#7a1f4f;--note:#fff7dd;--noteb:#e0a400;--tip:#e8f6ec;--tipb:#2e9a54;--h4:#8a2a00;--side:#f3f6fb;--h2fg:#fff;--btnfg:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f1319;--fg:#e4e8ee;--muted:#9aa5b3;--brand:#7fb0ff;--brand2:#ff6b7d;--card:#171d26;--line:#2b3441;--th:#1c2a44;--codebg:#121821;--inl:#202a38;--inlfg:#ffb1d6;--note:#2b2410;--noteb:#e0a400;--tip:#10261a;--tipb:#3fbf72;--h4:#ffb07a;--side:#121821;--h2fg:#0b1220;--btnfg:#0b1220}}
+:root[data-theme=dark]{--bg:#0f1319;--fg:#e4e8ee;--muted:#9aa5b3;--brand:#7fb0ff;--brand2:#ff6b7d;--card:#171d26;--line:#2b3441;--th:#1c2a44;--codebg:#121821;--inl:#202a38;--inlfg:#ffb1d6;--note:#2b2410;--noteb:#e0a400;--tip:#10261a;--tipb:#3fbf72;--h4:#ffb07a;--side:#121821;--h2fg:#0b1220;--btnfg:#0b1220}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"Noto Sans Thai","Sarabun","Leelawadee UI",Tahoma,system-ui,sans-serif;line-height:1.75;font-size:16px}
+.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--bg);border-bottom:1px solid var(--line)}
+.top b{color:var(--brand)}.top .sp{flex:1}
+.top button{font:inherit;font-size:14px;background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:4px 10px;cursor:pointer}
+#menu{display:none}
+.wrap{display:flex;max-width:1180px;margin:0 auto}
+nav.side{position:sticky;top:57px;align-self:flex-start;width:250px;flex:none;height:calc(100vh - 57px);overflow:auto;padding:18px 12px;background:var(--side);border-right:1px solid var(--line)}
+nav.side a{display:block;padding:6px 10px;border-radius:8px;color:var(--fg);text-decoration:none;font-size:14px;line-height:1.4;margin-bottom:2px}
+nav.side a:hover{background:var(--th)}nav.side a.on{background:var(--brand);color:var(--btnfg)}
+main{flex:1;min-width:0;padding:24px 28px 80px}
+.hero{border-bottom:3px solid var(--brand2);padding-bottom:14px;margin-bottom:18px}
+.hero h1{margin:0 0 6px;font-size:clamp(26px,5vw,38px);color:var(--brand);line-height:1.25}
+.hero p{margin:0;color:var(--muted)}
+h2{font-size:22px;color:var(--h2fg);background:var(--brand);padding:8px 14px;border-radius:8px;margin:38px 0 14px}
+h3{font-size:18px;color:var(--brand);border-bottom:2px solid var(--line);padding-bottom:3px;margin:26px 0 8px}
+h4{font-size:16px;color:var(--h4);margin:18px 0 4px}
+p{margin:6px 0 10px}ul,ol{padding-left:24px}li{margin:3px 0}
+code,pre,.code{font-family:"JetBrains Mono","DejaVu Sans Mono",Consolas,monospace}
+code{font-size:.86em;background:var(--inl);color:var(--inlfg);padding:1px 5px;border-radius:5px}
+pre{font-size:13.5px;line-height:1.55;background:var(--codebg);border:1px solid var(--line);border-left:4px solid var(--brand);padding:10px 14px;border-radius:8px;overflow:auto;margin:8px 0 14px}
+pre code{background:none;color:var(--fg);padding:0;font-size:inherit}
+table{border-collapse:collapse;width:100%;margin:8px 0 16px;font-size:15px;display:block;overflow-x:auto}
+th{background:var(--th);text-align:left;padding:7px 10px;border:1px solid var(--line)}
+td{padding:6px 10px;border:1px solid var(--line);vertical-align:top}
+.note,.tip{padding:10px 14px;border-radius:8px;margin:10px 0 14px}
+.note{background:var(--note);border-left:4px solid var(--noteb)}.tip{background:var(--tip);border-left:4px solid var(--tipb)}
+.fig{text-align:center;margin:12px 0 18px;overflow-x:auto}.fig .cap{font-size:14px;color:var(--muted)}
+.fig svg text{fill:#1b1f24}.fig svg text[fill]{fill:revert-layer}.fig svg .mono{font-family:"JetBrains Mono",monospace}
+.small{font-size:14px;color:var(--muted)}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}
+.toolbar button,.toolbar .btn{font:inherit;font-size:14px;background:var(--brand);color:var(--btnfg);border:0;border-radius:8px;padding:6px 14px;cursor:pointer;text-decoration:none}
+.code{font-size:12.5px;line-height:1.55;background:var(--codebg);border:1px solid var(--line);border-radius:8px;padding:10px 0;overflow:auto;max-height:80vh;counter-reset:ln}
+.code .l{display:block;white-space:pre;counter-increment:ln;padding-right:16px;min-height:1.55em}
+.code .l::before{content:counter(ln);display:inline-block;width:3.2em;margin-right:12px;text-align:right;color:var(--muted);opacity:.7;user-select:none}
+footer{margin-top:50px;color:var(--muted);font-size:14px;border-top:1px solid var(--line);padding-top:12px}
+@media (max-width:860px){#menu{display:inline-block}nav.side{position:fixed;left:0;top:57px;z-index:15;height:calc(100vh - 57px);transform:translateX(-100%);transition:transform .2s;width:80%;max-width:300px}nav.side.open{transform:none;box-shadow:0 0 30px rgba(0,0,0,.3)}main{padding:18px 16px 60px}}
+</style>
+</head>
+<body>
+<header class="top"><button id="menu" type="button" aria-label="เมนู">☰</button><b>MiniTest</b><span class="sp"></span><button id="theme" type="button" aria-label="สลับธีม">โหมดมืด/สว่าง</button></header>
+<div class="wrap">
+<nav class="side" id="side">
+<a href="#s1">1. ภาพรวมโปรแกรม</a>
+<a href="#s2">2. คลาส Product (ข้อ 1)</a>
+<a href="#s3">3. คลาส BinaryTree</a>
+<a href="#s4">4. คลาส BST</a>
+<a href="#s5">5. คลาส CBT</a>
+<a href="#s6">6. คลาส MiniTest (หน้าจอ GUI)</a>
+<a href="#s7">7. ตัวอย่างการรันทีละขั้น</a>
+<a href="#s8">8. จุดที่แก้จากโค้ดต้นฉบับ และข้อควรรู้</a>
+<a href="#code">ภาคผนวก: โค้ดทั้งหมด</a>
+</nav>
+<main>
+<div class="hero"><h1>อธิบายโค้ดโปรเจกต์ MiniTest</h1><p>“CBT &amp; BST’s Performance” — NetBeans JFrame Form (<code>MiniTest.java</code> + <code>MiniTest.form</code>) · วิชา 520213-165 Fundamentals of Data Structures and Applications</p></div>
+
+<h2 id="s1">1. ภาพรวมโปรแกรม</h2>
+
+<p>โปรแกรมนี้ทดลอง <b>เปรียบเทียบความเร็ว</b> ของต้นไม้ไบนารี 2 ชนิด คือ <b>CBT</b> (Complete Binary Tree) และ <b>BST</b> (Binary Search Tree) โดยใช้ข้อมูลสินค้าสุ่ม แล้ววัดเวลา “สร้างต้นไม้” และ “ค้นหา” ด้วยวิธีต่าง ๆ จากนั้นสรุปเป็นรายงานบนหน้าจอ</p>
+
+<h3>1.1 โครงสร้างไฟล์</h3>
+<p>โค้ดทั้งหมดอยู่ในไฟล์เดียว <code>MiniTest.java</code> (package <code>minitest</code>) ประกอบด้วย 5 คลาส เรียงตามลำดับในไฟล์:</p>
+<table>
+<tr><th style="width:20%">คลาส</th><th style="width:18%">บรรทัด</th><th>หน้าที่</th></tr>
+<tr><td><code>Product</code></td><td>16–99</td><td>เก็บข้อมูลสินค้า 1 ชิ้น (id, name, price, manufacturer, expDate) และสุ่มสินค้าใหม่</td></tr>
+<tr><td><code>BinaryTree</code></td><td>105–211</td><td>คลาสแม่ของต้นไม้ทั้งสอง มี root, <code>getHeight()</code>, <code>depthFirstSearch()</code>, <code>breadthFirstSearch()</code></td></tr>
+<tr><td><code>BST</code></td><td>217–297</td><td>สืบทอดจาก BinaryTree เพิ่ม <code>addNode()</code> แบบเรียงตาม name และ <code>binarySearch()</code></td></tr>
+<tr><td><code>CBT</code></td><td>303–332</td><td>สืบทอดจาก BinaryTree เพิ่ม <code>addNode()</code> แบบเติมทีละระดับจากซ้ายไปขวา</td></tr>
+<tr><td><code>MiniTest</code></td><td>337–จบ</td><td>หน้าต่าง <code>JFrame</code> มีปุ่ม/ช่องกรอก/ช่องแสดงผล และโค้ดที่ทำงานเมื่อกดปุ่ม</td></tr>
+</table>
+<p class="small">หมายเหตุ: <code>MiniTest</code> เป็นคลาส <code>public</code> เพียงตัวเดียวในไฟล์ (ชื่อต้องตรงกับชื่อไฟล์) คลาสอื่นเป็น package-private จึงอยู่รวมในไฟล์เดียวกันได้</p>
+
+<h3>1.2 ลำดับการทำงาน (Flow)</h3>
+<div class="fig">
+<svg style="max-width:640px;width:100%;height:auto" viewBox="0 0 640 150" xmlns="http://www.w3.org/2000/svg"  font-size="11">
+  <defs><marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#555"/></marker></defs>
+  <rect x="5" y="10" width="120" height="44" rx="6" fill="#dfe8f7" stroke="#0b3d91"/>
+  <text x="65" y="29" text-anchor="middle" font-weight="bold">Gen Product</text><text x="65" y="45" text-anchor="middle" font-size="10">สร้าง data[]</text>
+  <rect x="165" y="10" width="140" height="44" rx="6" fill="#dfe8f7" stroke="#0b3d91"/>
+  <text x="235" y="29" text-anchor="middle" font-weight="bold">Gen Search Samples</text><text x="235" y="45" text-anchor="middle" font-size="10">สุ่ม index → samples[]</text>
+  <rect x="345" y="10" width="120" height="44" rx="6" fill="#e8f6ec" stroke="#2e9a54"/>
+  <text x="405" y="29" text-anchor="middle" font-weight="bold">Gen CBT / Gen BST</text><text x="405" y="45" text-anchor="middle" font-size="10">สร้างต้นไม้ + จับเวลา</text>
+  <rect x="505" y="10" width="130" height="44" rx="6" fill="#fff7dd" stroke="#e0a400"/>
+  <text x="570" y="29" text-anchor="middle" font-weight="bold">ปุ่มค้นหา 5 ปุ่ม</text><text x="570" y="45" text-anchor="middle" font-size="10">ค้นด้วย samples + จับเวลา</text>
+  <line x1="125" y1="32" x2="163" y2="32" stroke="#555" marker-end="url(#ar)"/>
+  <line x1="305" y1="32" x2="343" y2="32" stroke="#555" marker-end="url(#ar)"/>
+  <line x1="465" y1="32" x2="503" y2="32" stroke="#555" marker-end="url(#ar)"/>
+  <rect x="220" y="95" width="200" height="44" rx="6" fill="#fde4e4" stroke="#d6001c"/>
+  <text x="320" y="114" text-anchor="middle" font-weight="bold">Report Sumary</text><text x="320" y="130" text-anchor="middle" font-size="10">รวมเวลาแสดงใน jTextArea1</text>
+  <line x1="570" y1="54" x2="430" y2="95" stroke="#555" marker-end="url(#ar)"/>
+  <line x1="405" y1="54" x2="360" y2="95" stroke="#555" marker-end="url(#ar)"/>
+</svg>
+<div class="cap">ลำดับที่ควรกด: Gen Product → Gen Search Samples → Gen CBT / Gen BST → ปุ่มค้นหา → Report Sumary</div>
+</div>
+
+<p>ข้อมูลที่ “ใช้ร่วมกัน” ระหว่างปุ่ม เก็บเป็นตัวแปรของคลาส <code>MiniTest</code>: <code>data[]</code> (สินค้าทั้งหมด), <code>samples[]</code> (index ที่สุ่มไว้ค้นหา), <code>cbt</code>, <code>bst</code> (ต้นไม้) และเวลาที่บันทึกไว้ ทำให้กดปุ่มทีละปุ่มแล้วผลต่อเนื่องกันได้</p>
+
+
+<h2 id="s2">2. คลาส Product (ข้อ 1)</h2>
+
+<p>แทนสินค้า 1 ชิ้น ฟิลด์ทุกตัวเป็น <code>private final</code> (กำหนดค่าครั้งเดียวผ่าน constructor แล้วเปลี่ยนไม่ได้)</p>
+
+<table>
+<tr><th style="width:24%">ฟิลด์</th><th style="width:18%">ชนิด</th><th>ความหมาย</th></tr>
+<tr><td><code>id</code></td><td>String</td><td>รหัสสินค้า 13 หลัก (สุ่มตัวเลข 0–9 ต่อกัน 13 ตัว) ค่า <code>"0"</code> ถูกสงวนไว้ใช้เป็นโหนดว่างของ BST</td></tr>
+<tr><td><code>name</code></td><td>String</td><td>ชื่อสินค้า เช่น <code>Laptop-xqzkabcd</code> — <b>เป็น key</b> ที่ใช้เรียงใน BST และใช้ค้นหา</td></tr>
+<tr><td><code>price</code></td><td>int</td><td>ราคา สุ่มเป็นผลคูณของ 100 ตั้งแต่ 100–10,000</td></tr>
+<tr><td><code>manufacturer</code></td><td>String</td><td>ผู้ผลิต สุ่มจาก Acme, Globex, Initech, Umbrella, Soylent, Hooli</td></tr>
+<tr><td><code>expDate</code></td><td>LocalDate</td><td>วันหมดอายุ สุ่มเป็นวันนี้ + 30 ถึง 1,124 วัน</td></tr>
+</table>
+
+<h3>เมธอดสำคัญ</h3>
+
+<h4><code>implements Comparable&lt;Product&gt;</code> และ <code>compareTo</code></h4>
+<pre><code>public int compareTo(Product other) {
+    return this.name.compareTo(other.name);
+}</code></pre>
+<p>กำหนดว่า “สินค้า 2 ชิ้นเรียงกันอย่างไร” ให้เทียบที่ <b>name</b> ตามข้อ 6 ผลลัพธ์ &lt; 0 แปลว่า this มาก่อน, = 0 เท่ากัน, &gt; 0 มาหลัง <code>BST.addNode</code> ใช้เมธอดนี้ตัดสินว่าจะไปซ้ายหรือขวา</p>
+
+<h4><code>Product.random(Random r)</code> — สร้างสินค้าสุ่ม</h4>
+<ul>
+<li><b>id</b>: วนลูป 13 รอบ ต่อเลขสุ่ม <code>r.nextInt(10)</code> ใส่ <code>StringBuilder</code></li>
+<li><b>name</b>: สุ่มชื่อฐาน 1 ใน 5 (Laptop, Smartphone, Headphones, Desk, Backpack) ต่อด้วย <code>-</code> และตัวอักษร a–z สุ่ม 8 ตัว <code>(char)('a' + r.nextInt(26))</code></li>
+<li><b>price</b>: <code>(r.nextInt(100) + 1) * 100</code> ได้ 100, 200, … 10000</li>
+<li><b>expDate</b>: <code>LocalDate.now().plusDays(30 + r.nextInt(1095))</code></li>
+</ul>
+<div class="note"><b>ทำไมต้องต่อตัวอักษรสุ่มท้ายชื่อ?</b> ถ้าใช้แค่ 5 ชื่อฐาน จะมีสินค้าชื่อซ้ำกันนับหมื่นชิ้น BST จะเอียงเป็นเส้นตรงยาวมากและช้ามาก ส่วนการค้นหาด้วยชื่อก็จะเจอชื่อซ้ำ ไม่ระบุตัวตนได้ การต่อ 8 ตัวอักษรทำให้ชื่อแทบไม่ซ้ำและกระจายตัวดี ต้นไม้จึงสมดุลพอสมควร</div>
+
+<h4><code>createEmpty()</code> และ <code>isEmpty()</code></h4>
+<p><code>createEmpty()</code> สร้าง Product ว่างที่มี <code>id = "0"</code> ใช้เป็นโหนด “ที่ว่าง” (dummy) ใน BST ส่วน <code>isEmpty()</code> ตรวจว่า id เป็น <code>"0"</code> หรือไม่ (เขียน <code>EMPTY_ID.equals(id)</code> เพื่อกัน NullPointerException)</p>
+
+<h4><code>toString()</code></h4>
+<p>คืนข้อความอ่านง่าย เช่น <code>1234567890123 (Laptop-abc, Price: 500, Manufacturer: Acme, Exp: 2027-03-01)</code> ถ้าเป็นโหนดว่างจะคืน <code>[Empty Node]</code></p>
+
+
+<h2 id="s3">3. คลาส BinaryTree</h2>
+
+<p>คลาสแม่ของ CBT และ BST ใช้ <code>DefaultMutableTreeNode</code> ของ Swing เป็นโหนด โดยตกลงกันว่า <b>ลูกคนที่ index 0 = ซ้าย, index 1 = ขวา</b> ข้อมูลที่โหนดเก็บ (<code>getUserObject()</code>) คือ <code>Product</code></p>
+
+<h3>3.1 ตัวแปรและเมธอดพื้นฐาน</h3>
+<table>
+<tr><th style="width:30%">สมาชิก</th><th>ทำอะไร</th></tr>
+<tr><td><code>protected root</code></td><td>โหนดราก ตอนเริ่มเป็น <code>null</code> (ต้นไม้ว่าง) คลาสลูกเข้าถึงได้เพราะเป็น <code>protected</code></td></tr>
+<tr><td><code>getRoot()</code></td><td>คืนค่าโหนดราก</td></tr>
+<tr><td><code>isRealNode(node)</code></td><td>เช็คว่าเป็นโหนดจริง คือ ไม่ใช่ null, เก็บ <code>Product</code> และไม่ใช่โหนดว่าง (id ≠ "0") ใช้กันไม่ให้นับ/เทียบโหนด dummy ของ BST</td></tr>
+</table>
+
+<h3>3.2 <code>getHeight()</code> — ความสูงของต้นไม้</h3>
+<pre><code>int height = 0;
+Queue&lt;DefaultMutableTreeNode&gt; level = new LinkedList&lt;&gt;();
+level.add(root);
+while (!level.isEmpty()) {
+    height++;                       // เจอ 1 ระดับใหม่
+    int size = level.size();        // จำนวนโหนดในระดับนี้
+    for (int i = 0; i &lt; size; i++) {
+        node = level.poll();
+        for each child that isRealNode: level.add(child);
+    }
+}
+return height;</code></pre>
+<p><b>แนวคิด:</b> นับทีละระดับ (level by level) ใช้คิวเก็บโหนดของระดับปัจจุบัน ทุกครั้งที่ประมวลผลครบทั้งระดับ ก็บวกความสูง 1 แล้วไประดับถัดไป</p>
+<ul>
+<li>นับเป็น <b>จำนวนระดับ</b>: ต้นไม้ที่มีแต่ราก = 1, ต้นไม้ว่าง = 0</li>
+<li>โหนด dummy ของ BST <b>ไม่ถูกนับ</b> (เพราะกรองด้วย <code>isRealNode</code>)</li>
+<li>เขียนแบบวนลูป (iterative) ไม่ใช้ recursion เพื่อไม่ให้ stack เต็มเมื่อต้นไม้ลึก</li>
+</ul>
+<p>ค่าที่เห็นเมื่อรัน: ข้อมูล 100,000 ชิ้น → CBT สูง <b>17</b> (เพราะ 2<sup>16</sup> = 65,536 &lt; 100,000 ≤ 2<sup>17</sup>) และ BST สูงประมาณ <b>40–45</b> (BST สุ่มไม่สมดุลเท่า CBT)</p>
+
+<h3>3.3 <code>depthFirstSearch(key)</code> — ค้นแบบลึกก่อน (DFS)</h3>
+<pre><code>private DefaultMutableTreeNode depthFirstSearchRecursive(node, key) {
+    if (node == null) return null;                  // 1) ไม่มีโหนด
+    if (isRealNode(node) &amp;&amp; name.equals(key)) return node;  // 2) เจอแล้ว
+    if (node.getChildCount() &gt; 0) {                 // 3) ลองฝั่งซ้ายก่อน
+        found = depthFirstSearchRecursive(child 0, key);
+        if (found != null) return found;
+    }
+    if (node.getChildCount() &gt; 1) {                 // 4) ถ้ายังไม่เจอ ลองฝั่งขวา
+        found = depthFirstSearchRecursive(child 1, key);
+        if (found != null) return found;
+    }
+    return null;                                    // 5) ไม่มีใน subtree นี้
+}</code></pre>
+<p><b>แนวคิด:</b> เจาะลงทางซ้ายให้สุดก่อน ถ้าไม่เจอค่อยถอยกลับมาลองทางขวา (ใช้ recursion — ตัวเมธอดเรียกตัวเอง) ถ้าเจอที่ฝั่งซ้ายจะ “ลัดวงจร” คืนค่าทันทีโดยไม่ต้องดูฝั่งขวา</p>
+<ul>
+<li><code>depthFirstSearch</code> (public) เป็นตัวห่อ เรียก <code>depthFirstSearchRecursive(root, key)</code></li>
+<li>เทียบด้วย <code>getName().equals(key)</code> — ใช้ <b>name</b> เป็นกุญแจค้นหา</li>
+<li>เวลาที่ใช้: O(n) กรณีแย่สุดต้องเดินทุกโหนด</li>
+</ul>
+
+<h3>3.4 <code>breadthFirstSearch(key)</code> — ค้นแบบกว้างก่อน (BFS)</h3>
+<pre><code>queue.add(root);
+while (!queue.isEmpty()) {
+    current = queue.poll();                     // หยิบหัวคิว
+    if (isRealNode(current) &amp;&amp; name.equals(key)) return current;
+    if (childCount &gt; 0) queue.add(child 0);     // ซ้ายเข้าคิว
+    if (childCount &gt; 1) queue.add(child 1);     // ขวาเข้าคิว
+}
+return null;</code></pre>
+<p><b>แนวคิด:</b> ค้นทีละระดับจากบนลงล่าง: ราก → ลูกระดับ 1 → ลูกระดับ 2 … ใช้ <b>คิว</b> (เข้าก่อนออกก่อน) ทำให้โหนดที่อยู่ระดับตื้นกว่าถูกตรวจก่อนเสมอ เวลาที่ใช้ O(n) เช่นกัน</p>
+<div class="tip"><b>ต่างจาก DFS อย่างไร?</b> DFS ใช้ stack (ผ่าน recursion) ดำดิ่งลงล่างก่อน ส่วน BFS ใช้ queue ไล่ทีละระดับ ทั้งคู่เจอคำตอบเดียวกัน แต่ลำดับการเดินผ่านโหนดต่างกัน จึงใช้เวลาไม่เท่ากันขึ้นกับว่าข้อมูลอยู่ตำแหน่งไหน</div>
+
+
+<h2 id="s4">4. คลาส BST</h2>
+
+<p>ต้นไม้ค้นหาแบบทวิภาค: ที่ทุกโหนด “ฝั่งซ้ายต้องมีชื่อน้อยกว่า” และ “ฝั่งขวามีชื่อมากกว่าหรือเท่ากับ” (เรียงตาม <code>name</code> ผ่าน <code>compareTo</code>)</p>
+
+<h3>4.1 แนวคิดโหนดว่าง (dummy node)</h3>
+<p>BST ในโค้ดนี้ใช้กติกาพิเศษ: <b>โหนดที่มีลูกต้องมีลูก 2 คนเสมอ</b> ถ้าฝั่งใดยังไม่มีข้อมูล จะเอาโหนดว่าง (Product id = "0") ไปแทนที่ไว้ ทำให้ <code>getChildAt(0)</code> เป็นซ้ายและ <code>getChildAt(1)</code> เป็นขวาเสมอ ไม่สลับกัน</p>
+
+<h3>4.2 <code>addNode(newNode)</code> — เพิ่มโหนด</h3>
+<ol>
+<li>ถ้า <code>newNode</code> หรือสินค้าข้างในเป็น null → ไม่ทำอะไร</li>
+<li>ถ้า <code>root == null</code> → โหนดนี้เป็นราก จบ</li>
+<li>ไม่เช่นนั้น เริ่มที่ <code>p = root</code> แล้ววนลูปลงไปหาที่ว่าง มี 2 กรณี:</li>
+</ol>
+<table>
+<tr><th style="width:26%">กรณี</th><th>การทำงาน</th></tr>
+<tr><td><b>Case 1</b><br>p ไม่มีลูก (<code>getChildCount()==0</code>)</td><td>ถ้า <code>newProduct &lt; currProduct</code>: ใส่ <code>newNode</code> เป็นลูกซ้าย และใส่ dummy เป็นลูกขวา<br>ถ้าไม่: ใส่ dummy เป็นลูกซ้าย และ <code>newNode</code> เป็นลูกขวา → แล้ว <code>break</code></td></tr>
+<tr><td><b>Case 2</b><br>p มีลูก 2 คน (<code>==2</code>)</td><td>เลือกซ้าย (ถ้า new &lt; curr) หรือขวา (กรณีอื่น)<br>• ถ้าลูกฝั่งนั้นเป็น dummy → <code>setUserObject(newProduct)</code> ใส่สินค้าแทนที่ แล้ว <code>break</code><br>• ถ้าเป็นโหนดจริง → <code>p = ลูกนั้น</code> แล้ววนต่อ</td></tr>
+</table>
+
+<h3>ตัวอย่าง: เพิ่ม M, F, T, A ตามลำดับ</h3>
+<div class="fig">
+<svg style="max-width:660px;width:100%;height:auto" viewBox="0 0 660 170" xmlns="http://www.w3.org/2000/svg" class="mono" font-size="11">
+  <g stroke="#555" fill="none">
+    <!-- tree 3: after M,F,T,  (x offset 0) ; tree 4 after A -->
+    <line x1="120" y1="38" x2="80" y2="82"/><line x1="120" y1="38" x2="160" y2="82"/>
+    <line x1="470" y1="38" x2="400" y2="82"/><line x1="470" y1="38" x2="540" y2="82"/>
+    <line x1="400" y1="98" x2="365" y2="140"/><line x1="400" y1="98" x2="435" y2="140"/>
+  </g>
+  <g stroke="#0b3d91" fill="#dfe8f7">
+    <circle cx="120" cy="28" r="14"/><circle cx="80" cy="92" r="14"/><circle cx="160" cy="92" r="14"/>
+    <circle cx="470" cy="28" r="14"/><circle cx="400" cy="92" r="14"/><circle cx="540" cy="92" r="14"/>
+    <circle cx="365" cy="150" r="14"/>
+  </g>
+  <g stroke="#999" fill="#eee" stroke-dasharray="3,2"><circle cx="435" cy="150" r="14"/></g>
+  <g text-anchor="middle">
+    <text x="120" y="32">M</text><text x="80" y="96">F</text><text x="160" y="96">T</text>
+    <text x="470" y="32">M</text><text x="400" y="96">F</text><text x="540" y="96">T</text>
+    <text x="365" y="154">A</text><text x="435" y="154" fill="#888">∅</text>
+  </g>
+  <text x="120" y="12" text-anchor="middle"  font-size="11" fill="#555">หลังเพิ่ม M, F, T</text>
+  <text x="470" y="12" text-anchor="middle"  font-size="11" fill="#555">หลังเพิ่ม A</text>
+  <text x="120" y="154" text-anchor="middle"  font-size="10" fill="#555">∅ = โหนดว่าง (dummy)</text>
+</svg>
+<div class="cap">
+M เป็นราก → F &lt; M แต่ M ไม่มีลูก (Case 1) จึงได้ F ซ้าย + ∅ ขวา → T &gt; M ขวาเป็น ∅ (Case 2) จึงแทนที่ด้วย T →<br>
+A &lt; M ไปซ้ายเจอ F (โหนดจริง) ลงไปที่ F ซึ่งไม่มีลูก (Case 1) จึงได้ A ซ้าย + ∅ ขวา
+</div>
+</div>
+
+<div class="note"><b>ข้อสังเกต:</b> ลูป <code>while(true)</code> ไม่ต้องจัดการกรณีมีลูก 1 คน เพราะโค้ดเพิ่มลูกทีละ 2 เสมอ ชื่อที่ <b>เท่ากัน</b> (<code>compareTo == 0</code>) จะถูกส่งไปทางขวา และโหนดที่ถูกแทนที่ dummy จะยังไม่มีลูกจนกว่าจะมีข้อมูลมาต่อใต้มัน</div>
+
+<h3>4.3 <code>binarySearch(key)</code> — ค้นแบบทวิภาค</h3>
+<pre><code>p = root;
+while (p != null) {
+    curr = (Product) p.getUserObject();
+    if (curr == null || curr.isEmpty()) return null;   // ชนที่ว่าง = ไม่มี
+    int c = key.compareTo(curr.getName());
+    if (c == 0)      return p;                          // เจอ
+    else if (c &lt; 0)  p = (childCount &gt; 0) ? child 0 : null;   // ไปซ้าย
+    else             p = (childCount &gt; 1) ? child 1 : null;   // ไปขวา
+}
+return null;</code></pre>
+<p><b>แนวคิด:</b> เปรียบ key กับชื่อที่โหนดปัจจุบัน ถ้าน้อยกว่าไปซ้าย มากกว่าไปขวา ตัดข้อมูลทิ้งครึ่งหนึ่งในแต่ละก้าว ไม่ต้องเดินทุกโหนด จึงใช้เวลาแค่ <b>O(h)</b> ตามความสูงต้นไม้ (~40 ก้าว จากข้อมูล 100,000 ชิ้น) เร็วกว่า DFS/BFS (<b>O(n)</b>) หลายร้อยเท่า</p>
+<p class="small">ใช้ได้เฉพาะ BST เพราะต้องอาศัยการเรียงลำดับ ใช้กับ CBT ไม่ได้เนื่องจาก CBT ไม่ได้เรียงตามชื่อ</p>
+
+
+<h2 id="s5">5. คลาส CBT</h2>
+
+<p>Complete Binary Tree: เติมโหนดทีละระดับ จากซ้ายไปขวา ไม่เว้นช่อง ไม่สนใจค่าข้อมูล (ลำดับก่อน-หลังตามที่ใส่เข้าไป)</p>
+
+<h3>กลไก: <code>nodeList</code> + สูตรหาโหนดพ่อ</h3>
+<p>คลาสมี <code>ArrayList nodeList</code> เก็บโหนดทั้งหมดเรียงตามลำดับที่ใส่ แล้วใช้ index หาพ่อด้วยสูตร:</p>
+<pre><code>parentIdx = (currentIdx - 1) / 2      // หารจำนวนเต็ม (ปัดลง)</code></pre>
+
+<div class="fig">
+<svg style="max-width:520px;width:100%;height:auto" viewBox="0 0 520 150" xmlns="http://www.w3.org/2000/svg" class="mono" font-size="11">
+  <g stroke="#555">
+    <line x1="260" y1="28" x2="150" y2="68"/><line x1="260" y1="28" x2="370" y2="68"/>
+    <line x1="150" y1="78" x2="95" y2="118"/><line x1="150" y1="78" x2="205" y2="118"/>
+    <line x1="370" y1="78" x2="315" y2="118"/><line x1="370" y1="78" x2="425" y2="118"/>
+  </g>
+  <g stroke="#0b3d91" fill="#dfe8f7">
+    <circle cx="260" cy="22" r="14"/><circle cx="150" cy="72" r="14"/><circle cx="370" cy="72" r="14"/>
+    <circle cx="95" cy="124" r="14"/><circle cx="205" cy="124" r="14"/><circle cx="315" cy="124" r="14"/><circle cx="425" cy="124" r="14"/>
+  </g>
+  <g text-anchor="middle">
+    <text x="260" y="26">0</text><text x="150" y="76">1</text><text x="370" y="76">2</text>
+    <text x="95" y="128">3</text><text x="205" y="128">4</text><text x="315" y="128">5</text><text x="425" y="128">6</text>
+  </g>
+</svg>
+<div class="cap">ตัวเลขในวงกลมคือ index ใน <code>nodeList</code> — พ่อของ 3 และ 4 คือ (3−1)/2 = (4−1)/2 = 1, พ่อของ 5 และ 6 คือ 2</div>
+</div>
+
+<h3><code>addNode(newNode)</code></h3>
+<ol>
+<li>ตรวจ null (เหมือน BST)</li>
+<li>เพิ่ม <code>newNode</code> ต่อท้าย <code>nodeList</code></li>
+<li>ถ้ายังไม่มีราก → เป็นราก แล้วจบ</li>
+<li>ไม่เช่นนั้นคำนวณ <code>currentIdx = nodeList.size() - 1</code> และ <code>parentIdx</code> ตามสูตร แล้ว <code>parentNode.add(newNode)</code></li>
+</ol>
+<p>เพราะลูกถูกเพิ่มตามลำดับ ลูกคนแรกของพ่อจึงเป็น index 0 (ซ้าย) และคนที่สองเป็น index 1 (ขวา) ตรงกับกติกาของ <code>BinaryTree</code> การเพิ่มแต่ละครั้งใช้เวลา O(1) จึงสร้างเร็วกว่า BST มาก (~0.02–0.05 วินาที เทียบกับ ~0.25 วินาที)</p>
+<p><code>getSize()</code> คืนจำนวนโหนดทั้งหมด (<code>nodeList.size()</code>)</p>
+
+
+<h2 id="s6">6. คลาส MiniTest (หน้าจอ GUI)</h2>
+
+<p><code>MiniTest extends javax.swing.JFrame</code> คือหน้าต่างโปรแกรม ส่วนโค้ดที่ NetBeans สร้างให้อัตโนมัติจากการลาก-วาง (<code>initComponents</code>) กับโค้ดที่เขียนเองอยู่ในไฟล์เดียวกัน</p>
+
+<h3>6.1 ตัวแปรของคลาส</h3>
+<table>
+<tr><th style="width:28%">ตัวแปร</th><th>ความหมาย</th></tr>
+<tr><td><code>NOT_RECORDED = -1</code></td><td>ค่าพิเศษ แปลว่า “ยังไม่มีการบันทึกเวลา” (เวลาจริงไม่มีทางติดลบ)</td></tr>
+<tr><td><code>CBT_DFS … BST_BS</code> (0–4)<br><code>MODE_NAMES[]</code></td><td>รหัสของการค้นหา 5 แบบ ใช้เป็น index ของ <code>searchAvg[]</code> และชื่อที่แสดง</td></tr>
+<tr><td><code>Product[] data</code></td><td>สินค้าทั้งหมด (ข้อ 2) เป็น <code>null</code> จนกว่าจะกด Gen Product</td></tr>
+<tr><td><code>int[] samples</code></td><td>index ของสินค้าที่สุ่มไว้ใช้ค้น (ข้อ 3) เก็บเป็นเลข index ไม่ใช่ตัวสินค้า</td></tr>
+<tr><td><code>static CBT cbt</code><br><code>static BST bst</code></td><td>ต้นไม้ที่สร้างไว้ <code>static</code> = เป็นของคลาส ไม่ใช่ของ object แต่ละหน้าต่าง (เหมาะเพราะมีหน้าต่างเดียว)</td></tr>
+<tr><td><code>cbtBuildTime, bstBuildTime</code></td><td>เวลาที่ใช้สร้างต้นไม้ (วินาที)</td></tr>
+<tr><td><code>double[] searchAvg</code></td><td>เวลาค้นหาเฉลี่ย 5 แบบ (ต่อ 1 ครั้งค้น)</td></tr>
+<tr><td><code>lastFoundCount</code></td><td>จำนวนครั้งที่ค้นเจอในรอบล่าสุด ใช้แสดงในแถบสถานะ (เช่น found 100/100)</td></tr>
+<tr><td><code>Random random</code></td><td>ตัวสุ่มที่ใช้ร่วมกันทั้งโปรแกรม</td></tr>
+</table>
+
+<h3>6.2 Constructor</h3>
+<pre><code>public MiniTest() {
+    initComponents();      // สร้างปุ่ม/ช่อง/จัดวางบนหน้าจอ
+    clearSearchTimes();    // ตั้งเวลาค้นหาทั้ง 5 ให้เป็น "ยังไม่บันทึก"
+}</code></pre>
+
+<h3>6.3 เมธอดช่วย (helpers)</h3>
+<table>
+<tr><th style="width:27%">เมธอด</th><th>ทำอะไร</th></tr>
+<tr><td><code>clearSearchTimes()</code></td><td>วนตั้ง <code>searchAvg[i] = NOT_RECORDED</code> ทุกช่อง</td></tr>
+<tr><td><code>setStatus(text)</code></td><td>แสดงข้อความในแถบสถานะ (<code>jLabel5</code> ใต้ช่องรายงาน)</td></tr>
+<tr><td><code>secondsSince(start)</code></td><td>แปลงเวลา: <code>(System.nanoTime() - start) / 1_000_000_000.0</code> ได้หน่วยวินาที (nano = 10<sup>-9</sup>)</td></tr>
+<tr><td><code>readPositiveInt(field, label)</code></td><td>อ่านเลขจำนวนเต็มบวกจากช่องกรอก ตัดช่องว่างด้วย <code>trim()</code> แล้ว <code>Integer.parseInt</code> ถ้าใช้ไม่ได้ (ว่าง/ตัวอักษร/ ≤ 0) จะขึ้น <code>JOptionPane</code> เตือน คืน <b>-1</b> และโฟกัสไปที่ช่องนั้น</td></tr>
+<tr><td><code>requireData()</code></td><td>เช็ค <code>data != null</code> ถ้ายังไม่กด Gen Product จะเตือน “Please press Gen Product first.” แล้วคืน false</td></tr>
+<tr><td><code>isCbtMode(mode)</code></td><td>true ถ้าเป็นโหมด CBT DFS หรือ CBT BFS</td></tr>
+<tr><td><code>treeReady(mode)</code></td><td>เช็คว่าต้นไม้ที่โหมดนั้นต้องใช้ถูกสร้างแล้ว (<code>cbt != null</code> หรือ <code>bst != null</code>)</td></tr>
+</table>
+
+<h4><code>timeSearch(mode)</code> — หัวใจของการวัดเวลาค้นหา</h4>
+<pre><code>String[] keys = new String[samples.length];
+for (i...) keys[i] = data[samples[i]].getName();   // 1) เตรียมกุญแจค้น
+
+long start = System.nanoTime();                    // 2) เริ่มจับเวลา
+for (String key : keys) {
+    switch (mode) {                                // เรียกวิธีค้นตามโหมด
+        case CBT_DFS: result = cbt.depthFirstSearch(key);   break;
+        case CBT_BFS: result = cbt.breadthFirstSearch(key); break;
+        case BST_DFS: result = bst.depthFirstSearch(key);   break;
+        case BST_BFS: result = bst.breadthFirstSearch(key); break;
+        case BST_BS:  result = bst.binarySearch(key);       break;
+    }
+    if (result != null) found++;
+}
+double total = secondsSince(start);                // 3) หยุดจับเวลา
+lastFoundCount = found;
+return total / keys.length;                        // 4) คืนค่าเฉลี่ยต่อ 1 ครั้ง</code></pre>
+<ul>
+<li>สร้างอาร์เรย์ <code>keys</code> <b>ก่อน</b>เริ่มจับเวลา เพื่อไม่ให้เวลาเตรียมข้อมูลปนเข้าไปในผลวัด</li>
+<li>กุญแจคือ <code>data[samples[i]].getName()</code> คือชื่อของสินค้าที่ index นั้น ซึ่งมีอยู่ในต้นไม้แน่ ๆ จึงต้องเจอทุกครั้ง (found = จำนวน samples)</li>
+<li>ได้ “เวลาเฉลี่ยต่อ 1 การค้นหา” ตรงกับรูปแบบ “Avg” ในรายงาน</li>
+</ul>
+
+<h4><code>runSearchButton(mode)</code> — ตัวกลางของปุ่มค้นหาทั้ง 5 (ข้อ 7–11)</h4>
+<ol>
+<li><code>requireData()</code> — ยังไม่มี data → เตือนแล้วออก</li>
+<li>เช็ค <code>samples == null</code> → เตือน “Please press Gen Search Samples first.”</li>
+<li>เช็ค <code>treeReady(mode)</code> → เตือนให้กด Gen CBT หรือ Gen BST ก่อน (ข้อความเลือกตามโหมด)</li>
+<li>บันทึก <code>searchAvg[mode] = timeSearch(mode)</code></li>
+<li>แสดงผลในแถบสถานะ เช่น <code>BST BS: avg 0.000007700 seconds (found 100/100)</code></li>
+</ol>
+<p>ปุ่มทั้ง 5 จึงเขียนสั้นมาก แค่ส่งรหัสโหมดมาให้เมธอดนี้ ไม่ต้องเขียนซ้ำ 5 รอบ</p>
+
+<h4><code>buildReport()</code> — สร้างข้อความรายงาน (ข้อ 12)</h4>
+<ol>
+<li><b>เติมสิ่งที่ “ทำได้”</b>: ถ้ามี samples แล้ว วนทุกโหมด ถ้าต้นไม้พร้อมแต่ยังไม่ได้กดปุ่มค้น จะรันค้นให้อัตโนมัติ ตามที่โจทย์ว่า “เฉพาะที่บันทึกไว้ (กดปุ่ม) หรือทำได้ (มีต้นไม้)”</li>
+<li>เขียนหัวรายงาน (เส้น <code>=</code>, ชื่อรายงาน, Data Size = <code>data.length</code>)</li>
+<li>เวลาสร้าง CBT / BST — แสดงเฉพาะที่บันทึกไว้ (<code>!= NOT_RECORDED</code>)</li>
+<li>ถ้ามีผลค้นหาอย่างน้อยหนึ่งแบบ: เส้นคั่น (เฉพาะเมื่อมีส่วนเวลาสร้างก่อนหน้า), บรรทัด Sample Size, แล้วเวลาเฉลี่ยของแต่ละแบบที่มี</li>
+<li>เส้น <code>=</code> ปิดท้าย แล้วคืน <code>String</code></li>
+</ol>
+<p>ใช้ <code>StringBuilder</code> ต่อข้อความ และ <code>String.format(Locale.US, "%.3f", ...)</code> เพื่อกำหนดทศนิยม (สร้าง = 3 ตำแหน่ง, ค้นหา = 9 ตำแหน่ง) ตรงตามตัวอย่างในโจทย์ <code>Locale.US</code> บังคับให้ใช้จุดทศนิยมเสมอ</p>
+
+<h3>6.4 <code>initComponents()</code> — โค้ดที่ NetBeans สร้าง (เริ่มบรรทัด 526)</h3>
+<div class="note"><b>อย่าแก้ด้วยมือ</b> ส่วนที่คั่นด้วย <code>//GEN-BEGIN … //GEN-END</code> (พื้นที่สีเทาที่พับได้ใน NetBeans) NetBeans สร้างจากไฟล์ <code>MiniTest.form</code> ถ้าแก้เองจะถูกเขียนทับ หากอยากเปลี่ยนหน้าตา ให้ใช้โหมด <b>Design</b> ลาก/แก้ใน NetBeans โดยตรง</div>
+<p>เมธอดนี้ <code>new</code> ทุก component, ตั้งข้อความ (<code>setText</code>), ผูกปุ่มกับเหตุการณ์ (<code>addActionListener</code>) และจัดวางด้วย <code>GroupLayout</code> สรุป component ทั้งหมด:</p>
+<table>
+<tr><th style="width:18%">ชื่อตัวแปร</th><th style="width:22%">ชนิด</th><th>ข้อความ / บทบาท</th></tr>
+<tr><td><code>jTextField1</code></td><td>JTextField</td><td>จำนวนสินค้า ค่าเริ่มต้น <b>100000</b> (ข้อ 2)</td></tr>
+<tr><td><code>jTextField2</code></td><td>JTextField</td><td>จำนวน samples ค่าเริ่มต้น <b>100</b> (ข้อ 3)</td></tr>
+<tr><td><code>jTextField3</code></td><td>JTextField (แก้ไขไม่ได้)</td><td>แสดงความสูง CBT (ข้อ 5)</td></tr>
+<tr><td><code>jTextField4</code></td><td>JTextField (แก้ไขไม่ได้)</td><td>แสดงความสูง BST (ข้อ 6)</td></tr>
+<tr><td><code>jTextArea1</code> (ใน <code>jScrollPane1</code>)</td><td>JTextArea (แก้ไขไม่ได้)</td><td>แสดงรายงาน ใช้ฟอนต์ Monospaced เพื่อให้คอลัมน์ตรงกัน</td></tr>
+<tr><td><code>jLabel1–4</code></td><td>JLabel</td><td>ป้ายหน้าช่องกรอก/แสดงผล</td></tr>
+<tr><td><code>jLabel5</code></td><td>JLabel</td><td>แถบสถานะใต้รายงาน (<code>setStatus</code>)</td></tr>
+<tr><td><code>jButton1–10</code></td><td>JButton</td><td>ปุ่มทั้ง 10 ตามตารางด้านล่าง</td></tr>
+</table>
+
+<h3>6.5 ตัวจัดการเหตุการณ์ของปุ่ม (Event handlers)</h3>
+<p>เมื่อผู้ใช้กดปุ่ม Swing จะเรียกเมธอด <code>jButtonNActionPerformed</code> ของปุ่มนั้น:</p>
+<table>
+<tr><th style="width:14%">ปุ่ม</th><th style="width:18%">ข้อ / บรรทัด</th><th>สิ่งที่ทำ</th></tr>
+<tr><td><b>Gen Product</b><br>jButton1</td><td>ข้อ 2<br>731</td><td>
+อ่านจำนวนจาก jTextField1 ผ่าน <code>readPositiveInt</code> (ผิดพลาด → ออก) → <code>data = new Product[n]</code> → วนเรียก <code>Product.random(random)</code> เติมทุกช่อง<br>
+<b>แล้วรีเซ็ตของเก่าที่ล้าสมัย:</b> <code>samples = null; cbt = null; bst = null;</code> ล้างเวลาทั้งหมด ล้าง jTextField3/4 และ jTextArea1 → แสดงสถานะ “Generated n products”</td></tr>
+<tr><td><b>Gen Search Samples</b><br>jButton2</td><td>ข้อ 3<br>754</td><td>
+<code>requireData()</code> → อ่านจำนวน k จาก jTextField2 → <code>samples = new int[k]</code> → แต่ละช่อง <code>random.nextInt(data.length)</code> (สุ่ม index 0 ถึง n−1; อาจซ้ำกันได้) → ล้างเวลาค้นหาเก่า (เพราะ samples เปลี่ยน)</td></tr>
+<tr><td><b>Gen CBT</b><br>jButton3</td><td>ข้อ 5<br>771</td><td>
+<code>cbt = new CBT()</code> → จับเวลา → วน <code>cbt.addNode(new DefaultMutableTreeNode(data[i]))</code> ตั้งแต่ i = 0 (ตามลำดับ) → <code>cbtBuildTime = secondsSince(start)</code> → ใส่ <code>cbt.getHeight()</code> ใน jTextField3 → ล้างเวลา CBT DFS/BFS เก่า</td></tr>
+<tr><td><b>Gen BST</b><br>jButton4</td><td>ข้อ 6<br>788</td><td>
+เหมือน Gen CBT แต่สร้าง <code>BST</code> ใส่ความสูงใน jTextField4 และล้างเวลา BST DFS/BFS/BS เก่า (ตำแหน่งในต้นไม้ตัดสินจาก <code>name</code> โดย <code>compareTo</code>)</td></tr>
+<tr><td><b>CBT DFS</b><br>jButton5</td><td>ข้อ 7<br>806</td><td><code>runSearchButton(CBT_DFS)</code></td></tr>
+<tr><td><b>CBT BFS</b><br>jButton6</td><td>ข้อ 8<br>811</td><td><code>runSearchButton(CBT_BFS)</code></td></tr>
+<tr><td><b>BST DFS</b><br>jButton7</td><td>ข้อ 9<br>816</td><td><code>runSearchButton(BST_DFS)</code></td></tr>
+<tr><td><b>BST BFS</b><br>jButton8</td><td>ข้อ 10<br>821</td><td><code>runSearchButton(BST_BFS)</code></td></tr>
+<tr><td><b>BST BS</b><br>jButton9</td><td>ข้อ 11<br>826</td><td><code>runSearchButton(BST_BS)</code></td></tr>
+<tr><td><b>Report Sumary</b><br>jButton10</td><td>ข้อ 12<br>831</td><td>ถ้ายังไม่มี data → แสดงข้อความ “No data yet…” ใน jTextArea1; ไม่เช่นนั้น <code>jTextArea1.setText(buildReport())</code> และ <code>setCaretPosition(0)</code> เลื่อนไปบนสุด</td></tr>
+</table>
+
+<h3>6.6 <code>main()</code> — จุดเริ่มโปรแกรม (บรรทัด 843)</h3>
+<ol>
+<li>ตั้ง Look and Feel เป็น <b>Nimbus</b> (หน้าตาสวยกว่าค่าเริ่มต้น) โดยวนหาใน <code>UIManager.getInstalledLookAndFeels()</code> ถ้าไม่มีก็ใช้ค่าเดิม</li>
+<li>สร้างหน้าต่างด้วย <code>java.awt.EventQueue.invokeLater(...)</code> ซึ่งทำให้ GUI ทำงานบน Event Dispatch Thread ตามมาตรฐาน Swing แล้ว <code>new MiniTest().setVisible(true)</code></li>
+</ol>
+
+
+<h2 id="s7">7. ตัวอย่างการรันทีละขั้น</h2>
+
+<table>
+<tr><th style="width:6%">#</th><th style="width:30%">สิ่งที่ผู้ใช้ทำ</th><th>ผลที่เกิดขึ้นในโปรแกรม</th></tr>
+<tr><td>1</td><td>กด <b>Gen Product</b> (ช่อง = 100000)</td><td><code>data</code> มีสินค้า 100,000 ชิ้น แถบสถานะ: <i>Generated 100000 products into data[].</i></td></tr>
+<tr><td>2</td><td>กด <b>Gen Search Samples</b> (ช่อง = 100)</td><td><code>samples</code> มีเลข index 100 ตัว</td></tr>
+<tr><td>3</td><td>กด <b>Gen CBT</b></td><td>ต้นไม้ CBT ถูกสร้าง ช่อง CBT Height = <b>17</b> แถบสถานะ <i>CBT built in 0.0xx seconds.</i></td></tr>
+<tr><td>4</td><td>กด <b>Gen BST</b></td><td>ต้นไม้ BST ถูกสร้าง ช่อง BST Height ≈ <b>40–45</b> ใช้เวลามากกว่า CBT (~0.25 วินาที)</td></tr>
+<tr><td>5</td><td>กดปุ่มค้นหาทีละปุ่ม</td><td>แถบสถานะแสดงเวลาเฉลี่ย เช่น <i>CBT DFS: avg 0.003 … (found 100/100)</i></td></tr>
+<tr><td>6</td><td>กด <b>Report Sumary</b></td><td>jTextArea1 แสดงรายงานรวมทั้งหมดตามรูปแบบในโจทย์</td></tr>
+</table>
+
+<h3>ตัวอย่างรายงานจากการรันจริง (ค่าจะเปลี่ยนทุกครั้ง)</h3>
+<pre><code>==================================================
+       PERFORMANCE REPORT SUMMARY
+       (Data Size = 100000)
+==================================================
+CBT Construction Time : 0.022 seconds
+BST Construction Time : 0.235 seconds
+--------------------------------------------------
+       (Sample Size = 100)
+CBT DFS Avg  : 0.003547907 seconds
+CBT BFS Avg  : 0.005161436 seconds
+BST DFS Avg  : 0.007998430 seconds
+BST BFS Avg  : 0.008598252 seconds
+BST BS  Avg  : 0.000007697 seconds
+==================================================</code></pre>
+
+<h3>วิเคราะห์ผล</h3>
+<ul>
+<li><b>สร้าง CBT เร็วกว่า BST</b> — CBT ใส่ท้ายแบบ O(1) ต่อโหนด ส่วน BST ต้องเดินลงจากรากไปหาที่ (~log n ก้าว ต่อโหนด)</li>
+<li><b>BST BS เร็วที่สุดหลายร้อยเท่า</b> — ใช้เวลา O(h) แทน O(n) เพราะตัดครึ่งทางทุกก้าว (ค่าที่ได้อยู่ระดับไมโครวินาที)</li>
+<li><b>BST DFS/BFS ช้ากว่า CBT DFS/BFS</b> — สาเหตุหนึ่งคือ BST มีโหนด dummy จำนวนมาก (ประมาณเท่ากับโหนดจริง) ทำให้ต้องเดินผ่านโหนดมากกว่าราว 2 เท่า</li>
+<li><b>DFS กับ BFS ผลต่างกันเล็กน้อย</b> — ขึ้นกับว่าสินค้าที่สุ่มค้นอยู่ลึกหรือตื้น และอยู่ฝั่งซ้ายหรือขวา ไม่มีวิธีใดชนะเสมอ</li>
+</ul>
+
+
+<h2 id="s8">8. จุดที่แก้จากโค้ดต้นฉบับ และข้อควรรู้</h2>
+
+<h3>8.1 สิ่งที่ต่างจากโค้ดต้นฉบับที่ได้รับ (<code>JavaApplication37.java</code>)</h3>
+<table>
+<tr><th style="width:30%">จุด</th><th>ต้นฉบับ → ที่ใช้ในงานนี้</th></tr>
+<tr><td>ฟิลด์ <code>Product</code></td><td><code>productId, name, category, price</code> → <code>id, name, price, manufacturer, expDate</code> ตามข้อ 1</td></tr>
+<tr><td>กุญแจเรียง/ค้นหา</td><td><code>productId</code> → <code>name</code> (<code>compareTo</code> และการค้นหาทุกแบบ ตามข้อ 6)</td></tr>
+<tr><td>โหนด dummy</td><td><code>new Product("0","","",0)</code> + <code>getProductId().equals("0")</code> → <code>Product.createEmpty()</code> + <code>isEmpty()</code> (ยังใช้ id "0" เหมือนเดิม)</td></tr>
+<tr><td><code>getHeight()</code></td><td>ต้นฉบับไม่มี → เพิ่มใน <code>BinaryTree</code> สำหรับข้อ 5–6</td></tr>
+<tr><td>บั๊กในต้นฉบับ</td><td>บรรทัดวัดเวลา <b>BST BFS</b> ต้นฉบับเรียก <code>cbt.breadthFirstSearch</code> → แก้เป็น <code>bst.breadthFirstSearch</code></td></tr>
+<tr><td><code>main()</code> แบบข้อความ</td><td>แทนด้วย GUI: ค่าที่เคยกำหนดตายตัว (100,000 / 100) กลายเป็นค่าเริ่มต้นในช่องกรอก</td></tr>
+</table>
+<p>ส่วนที่ <b>ไม่เปลี่ยน</b>: ตรรกะ <code>BST.addNode</code>, <code>CBT.addNode</code>, โครงสร้างต้นไม้ (ซ้าย = index 0, ขวา = index 1) และอัลกอริทึม DFS/BFS/Binary Search</p>
+
+<h3>8.2 ข้อตัดสินใจของผู้เขียนที่อาจารย์อาจคิดต่าง</h3>
+<ul>
+<li><b>ความสูง</b> นับเป็นจำนวนระดับ (โหนดเดียว = 1) หากนับเป็นจำนวนเส้นเชื่อมให้ลบ 1</li>
+<li><b>ปุ่ม Report Sumary</b> รันการค้นหาที่ยังไม่ได้กดให้เองถ้ามีต้นไม้และ samples (ตีความ “หรือทำได้”) หากต้องการแสดงเฉพาะที่กดแล้ว ให้ลบบล็อก <code>if (samples != null) { … }</code> ต้นเมธอด <code>buildReport()</code></li>
+<li><b>ชื่อสินค้า</b> มีตัวอักษรสุ่มต่อท้ายเพื่อให้ชื่อไม่ซ้ำ (ดูข้อ 2)</li>
+<li>แสดงข้อความเตือน (<code>JOptionPane</code>) เมื่อกรอกผิดหรือกดปุ่มผิดลำดับ — เพิ่มเพื่อกันโปรแกรมค้าง/error ไม่ได้ระบุในโจทย์</li>
+</ul>
+
+<h3>8.3 ข้อจำกัดที่ควรรู้</h3>
+<ul>
+<li>ถ้าข้อมูลถูกใส่ใน BST ตามลำดับที่เรียงอยู่แล้ว ต้นไม้จะเป็นเส้นตรงยาวมาก (สูง = n) ทำให้ช้า และ DFS แบบ recursion อาจเกิด <code>StackOverflowError</code> — งานนี้ใช้ข้อมูลสุ่มจึงไม่เกิด</li>
+<li>เวลาที่วัดได้เปลี่ยนไปในแต่ละครั้งที่รัน (ขึ้นกับเครื่อง, JIT ของ Java, และสินค้าที่สุ่มได้) การกด Report ซ้ำหลังค้นหาหลายรอบมักได้ค่าที่เสถียรกว่ารอบแรก</li>
+<li>ถ้ากด Gen Product ใหม่ ต้องกด Gen Search Samples และ Gen CBT/BST ใหม่ทั้งหมด เพราะข้อมูลเก่าถูกล้างทิ้ง</li>
+</ul>
+
+<h2 id="code">ภาคผนวก: โค้ดทั้งหมดของ MiniTest.java</h2>
+<p class="small">เลขบรรทัดตรงกับที่อ้างถึงในเอกสาร ส่วนระหว่าง <code>//GEN-BEGIN</code> และ <code>//GEN-END</code> (บรรทัด 525–728) คือโค้ดที่ NetBeans สร้างจากไฟล์ .form</p>
+<div class="toolbar"><button id="copy" type="button">คัดลอกโค้ดทั้งหมด</button><a class="btn" href="MiniTest.java" download>ดาวน์โหลด MiniTest.java</a></div>
+<div class="code" id="codebox"><span class="l">package minitest;</span><span class="l"> </span><span class="l">import java.time.LocalDate;</span><span class="l">import java.util.ArrayList;</span><span class="l">import java.util.LinkedList;</span><span class="l">import java.util.Locale;</span><span class="l">import java.util.Queue;</span><span class="l">import java.util.Random;</span><span class="l">import javax.swing.JOptionPane;</span><span class="l">import javax.swing.tree.DefaultMutableTreeNode;</span><span class="l"> </span><span class="l">/**</span><span class="l"> * Item 1: Product with fields id, name, price, manufacturer and expDate.</span><span class="l"> * Products are ordered by name (used by the BST).</span><span class="l"> */</span><span class="l">class Product implements Comparable&lt;Product&gt; {</span><span class="l"> </span><span class="l">    /** id of the dummy (empty) leaf nodes used by the BST. */</span><span class="l">    public static final String EMPTY_ID = &quot;0&quot;;</span><span class="l"> </span><span class="l">    private static final String[] NAMES = {&quot;Laptop&quot;, &quot;Smartphone&quot;, &quot;Headphones&quot;, &quot;Desk&quot;, &quot;Backpack&quot;};</span><span class="l">    private static final String[] MANUFACTURERS = {&quot;Acme&quot;, &quot;Globex&quot;, &quot;Initech&quot;, &quot;Umbrella&quot;, &quot;Soylent&quot;, &quot;Hooli&quot;};</span><span class="l"> </span><span class="l">    private final String id;</span><span class="l">    private final String name;</span><span class="l">    private final int price;</span><span class="l">    private final String manufacturer;</span><span class="l">    private final LocalDate expDate;</span><span class="l"> </span><span class="l">    public Product(String id, String name, int price, String manufacturer, LocalDate expDate) {</span><span class="l">        this.id = id;</span><span class="l">        this.name = name;</span><span class="l">        this.price = price;</span><span class="l">        this.manufacturer = manufacturer;</span><span class="l">        this.expDate = expDate;</span><span class="l">    }</span><span class="l"> </span><span class="l">    /** Dummy node content used by the BST for an empty child slot. */</span><span class="l">    public static Product createEmpty() {</span><span class="l">        return new Product(EMPTY_ID, &quot;&quot;, 0, &quot;&quot;, null);</span><span class="l">    }</span><span class="l"> </span><span class="l">    /**</span><span class="l">     * Creates a random product. The name gets a random suffix so that names are</span><span class="l">     * (almost always) unique and well spread, which keeps the BST reasonably balanced.</span><span class="l">     */</span><span class="l">    public static Product random(Random r) {</span><span class="l">        StringBuilder id = new StringBuilder();</span><span class="l">        for (int i = 0; i &lt; 13; i++) {</span><span class="l">            id.append(r.nextInt(10));</span><span class="l">        }</span><span class="l">        StringBuilder name = new StringBuilder(NAMES[r.nextInt(NAMES.length)]).append(&#x27;-&#x27;);</span><span class="l">        for (int i = 0; i &lt; 8; i++) {</span><span class="l">            name.append((char) (&#x27;a&#x27; + r.nextInt(26)));</span><span class="l">        }</span><span class="l">        int price = (r.nextInt(100) + 1) * 100;</span><span class="l">        String manufacturer = MANUFACTURERS[r.nextInt(MANUFACTURERS.length)];</span><span class="l">        LocalDate expDate = LocalDate.now().plusDays(30 + r.nextInt(1095));</span><span class="l">        return new Product(id.toString(), name.toString(), price, manufacturer, expDate);</span><span class="l">    }</span><span class="l"> </span><span class="l">    public boolean isEmpty() {</span><span class="l">        return EMPTY_ID.equals(id);</span><span class="l">    }</span><span class="l"> </span><span class="l">    public String getId() {</span><span class="l">        return id;</span><span class="l">    }</span><span class="l"> </span><span class="l">    public String getName() {</span><span class="l">        return name;</span><span class="l">    }</span><span class="l"> </span><span class="l">    public int getPrice() {</span><span class="l">        return price;</span><span class="l">    }</span><span class="l"> </span><span class="l">    public String getManufacturer() {</span><span class="l">        return manufacturer;</span><span class="l">    }</span><span class="l"> </span><span class="l">    public LocalDate getExpDate() {</span><span class="l">        return expDate;</span><span class="l">    }</span><span class="l"> </span><span class="l">    @Override</span><span class="l">    public int compareTo(Product other) {</span><span class="l">        return this.name.compareTo(other.name);</span><span class="l">    }</span><span class="l"> </span><span class="l">    @Override</span><span class="l">    public String toString() {</span><span class="l">        if (isEmpty()) {</span><span class="l">            return &quot;[Empty Node]&quot;;</span><span class="l">        }</span><span class="l">        return id + &quot; (&quot; + name + &quot;, Price: &quot; + price + &quot;, Manufacturer: &quot; + manufacturer</span><span class="l">                + &quot;, Exp: &quot; + expDate + &quot;)&quot;;</span><span class="l">    }</span><span class="l">}</span><span class="l"> </span><span class="l">/**</span><span class="l"> * Base binary tree (from the given code). Child index 0 = left, index 1 = right.</span><span class="l"> * All searches use the product name as the key.</span><span class="l"> */</span><span class="l">class BinaryTree {</span><span class="l"> </span><span class="l">    protected DefaultMutableTreeNode root;</span><span class="l"> </span><span class="l">    public BinaryTree() {</span><span class="l">        this.root = null;</span><span class="l">    }</span><span class="l"> </span><span class="l">    public DefaultMutableTreeNode getRoot() {</span><span class="l">        return root;</span><span class="l">    }</span><span class="l"> </span><span class="l">    /** A real node holds a Product that is not the BST&#x27;s empty dummy. */</span><span class="l">    protected static boolean isRealNode(DefaultMutableTreeNode node) {</span><span class="l">        if (node == null) {</span><span class="l">            return false;</span><span class="l">        }</span><span class="l">        Object obj = node.getUserObject();</span><span class="l">        return (obj instanceof Product) &amp;&amp; !((Product) obj).isEmpty();</span><span class="l">    }</span><span class="l"> </span><span class="l">    /**</span><span class="l">     * Height of the tree counted in levels (a single root = 1, empty tree = 0).</span><span class="l">     * BST dummy nodes are not counted. Iterative, so it is safe for deep trees.</span><span class="l">     */</span><span class="l">    public int getHeight() {</span><span class="l">        if (!isRealNode(root)) {</span><span class="l">            return 0;</span><span class="l">        }</span><span class="l">        int height = 0;</span><span class="l">        Queue&lt;DefaultMutableTreeNode&gt; level = new LinkedList&lt;&gt;();</span><span class="l">        level.add(root);</span><span class="l">        while (!level.isEmpty()) {</span><span class="l">            height++;</span><span class="l">            int size = level.size();</span><span class="l">            for (int i = 0; i &lt; size; i++) {</span><span class="l">                DefaultMutableTreeNode node = level.poll();</span><span class="l">                for (int c = 0; c &lt; node.getChildCount(); c++) {</span><span class="l">                    DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt(c);</span><span class="l">                    if (isRealNode(child)) {</span><span class="l">                        level.add(child);</span><span class="l">                    }</span><span class="l">                }</span><span class="l">            }</span><span class="l">        }</span><span class="l">        return height;</span><span class="l">    }</span><span class="l"> </span><span class="l">    public DefaultMutableTreeNode depthFirstSearch(String key) {</span><span class="l">        return depthFirstSearchRecursive(root, key);</span><span class="l">    }</span><span class="l"> </span><span class="l">    private DefaultMutableTreeNode depthFirstSearchRecursive(DefaultMutableTreeNode node, String key) {</span><span class="l">        // Base case: this branch has no node</span><span class="l">        if (node == null) {</span><span class="l">            return null;</span><span class="l">        }</span><span class="l"> </span><span class="l">        if (isRealNode(node) &amp;&amp; ((Product) node.getUserObject()).getName().equals(key)) {</span><span class="l">            return node;</span><span class="l">        }</span><span class="l"> </span><span class="l">        // Left child (index 0)</span><span class="l">        if (node.getChildCount() &gt; 0) {</span><span class="l">            DefaultMutableTreeNode foundLeft = depthFirstSearchRecursive((DefaultMutableTreeNode) node.getChildAt(0), key);</span><span class="l">            if (foundLeft != null) {</span><span class="l">                return foundLeft;</span><span class="l">            }</span><span class="l">        }</span><span class="l"> </span><span class="l">        // Right child (index 1)</span><span class="l">        if (node.getChildCount() &gt; 1) {</span><span class="l">            DefaultMutableTreeNode foundRight = depthFirstSearchRecursive((DefaultMutableTreeNode) node.getChildAt(1), key);</span><span class="l">            if (foundRight != null) {</span><span class="l">                return foundRight;</span><span class="l">            }</span><span class="l">        }</span><span class="l"> </span><span class="l">        return null;</span><span class="l">    }</span><span class="l"> </span><span class="l">    public DefaultMutableTreeNode breadthFirstSearch(String key) {</span><span class="l">        if (root == null) {</span><span class="l">            return null;</span><span class="l">        }</span><span class="l"> </span><span class="l">        Queue&lt;DefaultMutableTreeNode&gt; queue = new LinkedList&lt;&gt;();</span><span class="l">        queue.add(root);</span><span class="l"> </span><span class="l">        while (!queue.isEmpty()) {</span><span class="l">            DefaultMutableTreeNode current = queue.poll();</span><span class="l"> </span><span class="l">            if (isRealNode(current) &amp;&amp; ((Product) current.getUserObject()).getName().equals(key)) {</span><span class="l">                return current;</span><span class="l">            }</span><span class="l"> </span><span class="l">            int childCount = current.getChildCount();</span><span class="l">            if (childCount &gt; 0) {</span><span class="l">                queue.add((DefaultMutableTreeNode) current.getChildAt(0)); // left</span><span class="l">            }</span><span class="l">            if (childCount &gt; 1) {</span><span class="l">                queue.add((DefaultMutableTreeNode) current.getChildAt(1)); // right</span><span class="l">            }</span><span class="l">        }</span><span class="l">        return null;</span><span class="l">    }</span><span class="l">}</span><span class="l"> </span><span class="l">/**</span><span class="l"> * Binary search tree ordered by Product.name (Product.compareTo).</span><span class="l"> * Empty child slots are filled with dummy nodes whose Product id is &quot;0&quot;.</span><span class="l"> */</span><span class="l">class BST extends BinaryTree {</span><span class="l"> </span><span class="l">    public BST() {</span><span class="l">        super();</span><span class="l">    }</span><span class="l"> </span><span class="l">    public void addNode(DefaultMutableTreeNode newNode) {</span><span class="l">        if (newNode == null || newNode.getUserObject() == null) {</span><span class="l">            return;</span><span class="l">        }</span><span class="l">        Product newProduct = (Product) newNode.getUserObject();</span><span class="l"> </span><span class="l">        if (root == null) {</span><span class="l">            root = newNode;</span><span class="l">        } else {</span><span class="l">            DefaultMutableTreeNode p = root;</span><span class="l">            while (true) {</span><span class="l">                Product currProduct = (Product) p.getUserObject();</span><span class="l"> </span><span class="l">                // Case 1: leaf (no children) -&gt; create left/right children, one of them a dummy</span><span class="l">                if (p.getChildCount() == 0) {</span><span class="l">                    if (newProduct.compareTo(currProduct) &lt; 0) {</span><span class="l">                        p.add(newNode); // left child</span><span class="l">                        p.add(new DefaultMutableTreeNode(Product.createEmpty())); // dummy right child</span><span class="l">                    } else {</span><span class="l">                        p.add(new DefaultMutableTreeNode(Product.createEmpty())); // dummy left child</span><span class="l">                        p.add(newNode); // right child</span><span class="l">                    }</span><span class="l">                    break;</span><span class="l">                } // Case 2: node already has 2 children -&gt; go down</span><span class="l">                else if (p.getChildCount() == 2) {</span><span class="l">                    if (newProduct.compareTo(currProduct) &lt; 0) {</span><span class="l">                        DefaultMutableTreeNode leftChildNode = (DefaultMutableTreeNode) p.getChildAt(0);</span><span class="l">                        Product leftProduct = (Product) leftChildNode.getUserObject();</span><span class="l"> </span><span class="l">                        // Replace the dummy if the slot is empty</span><span class="l">                        if (leftProduct.isEmpty()) {</span><span class="l">                            leftChildNode.setUserObject(newProduct);</span><span class="l">                            break;</span><span class="l">                        }</span><span class="l">                        p = leftChildNode;</span><span class="l">                    } else {</span><span class="l">                        DefaultMutableTreeNode rightChildNode = (DefaultMutableTreeNode) p.getChildAt(1);</span><span class="l">                        Product rightProduct = (Product) rightChildNode.getUserObject();</span><span class="l"> </span><span class="l">                        if (rightProduct.isEmpty()) {</span><span class="l">                            rightChildNode.setUserObject(newProduct);</span><span class="l">                            break;</span><span class="l">                        }</span><span class="l">                        p = rightChildNode;</span><span class="l">                    }</span><span class="l">                }</span><span class="l">            }</span><span class="l">        }</span><span class="l">    }</span><span class="l"> </span><span class="l">    /** Binary search by product name. */</span><span class="l">    public DefaultMutableTreeNode binarySearch(String key) {</span><span class="l">        DefaultMutableTreeNode p = root;</span><span class="l"> </span><span class="l">        while (p != null) {</span><span class="l">            Product currProduct = (Product) p.getUserObject();</span><span class="l"> </span><span class="l">            // Stop at a dead end or an empty dummy slot</span><span class="l">            if (currProduct == null || currProduct.isEmpty()) {</span><span class="l">                return null;</span><span class="l">            }</span><span class="l"> </span><span class="l">            int compareResult = key.compareTo(currProduct.getName());</span><span class="l"> </span><span class="l">            if (compareResult == 0) {</span><span class="l">                return p;</span><span class="l">            } else if (compareResult &lt; 0) {</span><span class="l">                p = (p.getChildCount() &gt; 0) ? (DefaultMutableTreeNode) p.getChildAt(0) : null;</span><span class="l">            } else {</span><span class="l">                p = (p.getChildCount() &gt; 1) ? (DefaultMutableTreeNode) p.getChildAt(1) : null;</span><span class="l">            }</span><span class="l">        }</span><span class="l">        return null;</span><span class="l">    }</span><span class="l">}</span><span class="l"> </span><span class="l">/**</span><span class="l"> * Complete binary tree: nodes are added level by level, left to right.</span><span class="l"> * The parent of the node at index i is the node at index (i - 1) / 2.</span><span class="l"> */</span><span class="l">class CBT extends BinaryTree {</span><span class="l"> </span><span class="l">    private final ArrayList&lt;DefaultMutableTreeNode&gt; nodeList;</span><span class="l"> </span><span class="l">    public CBT() {</span><span class="l">        super();</span><span class="l">        nodeList = new ArrayList&lt;&gt;();</span><span class="l">    }</span><span class="l"> </span><span class="l">    public void addNode(DefaultMutableTreeNode newNode) {</span><span class="l">        if (newNode == null || newNode.getUserObject() == null) {</span><span class="l">            return;</span><span class="l">        }</span><span class="l">        nodeList.add(newNode);</span><span class="l"> </span><span class="l">        if (root == null) {</span><span class="l">            root = newNode;</span><span class="l">            return;</span><span class="l">        }</span><span class="l"> </span><span class="l">        int currentIdx = nodeList.size() - 1;</span><span class="l">        int parentIdx = (currentIdx - 1) / 2;</span><span class="l">        DefaultMutableTreeNode parentNode = nodeList.get(parentIdx);</span><span class="l">        parentNode.add(newNode);</span><span class="l">    }</span><span class="l"> </span><span class="l">    public int getSize() {</span><span class="l">        return nodeList.size();</span><span class="l">    }</span><span class="l">}</span><span class="l"> </span><span class="l">/**</span><span class="l"> * MiniTest &quot;CBT &amp; BST&#x27;s Performance&quot; - JFrame Form (NetBeans GUI Builder).</span><span class="l"> */</span><span class="l">public class MiniTest extends javax.swing.JFrame {</span><span class="l"> </span><span class="l">    private static final double NOT_RECORDED = -1;</span><span class="l"> </span><span class="l">    // Search modes (index into searchAvg)</span><span class="l">    private static final int CBT_DFS = 0;</span><span class="l">    private static final int CBT_BFS = 1;</span><span class="l">    private static final int BST_DFS = 2;</span><span class="l">    private static final int BST_BFS = 3;</span><span class="l">    private static final int BST_BS = 4;</span><span class="l">    private static final String[] MODE_NAMES = {&quot;CBT DFS&quot;, &quot;CBT BFS&quot;, &quot;BST DFS&quot;, &quot;BST BFS&quot;, &quot;BST BS&quot;};</span><span class="l"> </span><span class="l">    private Product[] data;      // item 2</span><span class="l">    private int[] samples;       // item 3 (indexes into data)</span><span class="l">    private static CBT cbt;</span><span class="l">    private static BST bst;</span><span class="l"> </span><span class="l">    private double cbtBuildTime = NOT_RECORDED;</span><span class="l">    private double bstBuildTime = NOT_RECORDED;</span><span class="l">    private final double[] searchAvg = new double[5];</span><span class="l">    private int lastFoundCount;</span><span class="l"> </span><span class="l">    private final Random random = new Random();</span><span class="l"> </span><span class="l">    public MiniTest() {</span><span class="l">        initComponents();</span><span class="l">        clearSearchTimes();</span><span class="l">    }</span><span class="l"> </span><span class="l">    // ------------------------------------------------------------------ helpers</span><span class="l"> </span><span class="l">    private void clearSearchTimes() {</span><span class="l">        for (int i = 0; i &lt; searchAvg.length; i++) {</span><span class="l">            searchAvg[i] = NOT_RECORDED;</span><span class="l">        }</span><span class="l">    }</span><span class="l"> </span><span class="l">    private void setStatus(String text) {</span><span class="l">        jLabel5.setText(text);</span><span class="l">    }</span><span class="l"> </span><span class="l">    private static double secondsSince(long startNanos) {</span><span class="l">        return (System.nanoTime() - startNanos) / 1_000_000_000.0;</span><span class="l">    }</span><span class="l"> </span><span class="l">    /** Reads a positive integer from a text field, or shows a message and returns -1. */</span><span class="l">    private int readPositiveInt(javax.swing.JTextField field, String label) {</span><span class="l">        try {</span><span class="l">            int value = Integer.parseInt(field.getText().trim());</span><span class="l">            if (value &gt; 0) {</span><span class="l">                return value;</span><span class="l">            }</span><span class="l">        } catch (NumberFormatException e) {</span><span class="l">            // fall through to the message below</span><span class="l">        }</span><span class="l">        JOptionPane.showMessageDialog(this, &quot;Please enter a positive integer for &quot; + label + &quot;.&quot;,</span><span class="l">                &quot;Invalid input&quot;, JOptionPane.WARNING_MESSAGE);</span><span class="l">        field.requestFocus();</span><span class="l">        return -1;</span><span class="l">    }</span><span class="l"> </span><span class="l">    private boolean requireData() {</span><span class="l">        if (data == null) {</span><span class="l">            JOptionPane.showMessageDialog(this, &quot;Please press Gen Product first.&quot;,</span><span class="l">                    &quot;No data&quot;, JOptionPane.WARNING_MESSAGE);</span><span class="l">            return false;</span><span class="l">        }</span><span class="l">        return true;</span><span class="l">    }</span><span class="l"> </span><span class="l">    private boolean isCbtMode(int mode) {</span><span class="l">        return mode == CBT_DFS || mode == CBT_BFS;</span><span class="l">    }</span><span class="l"> </span><span class="l">    private boolean treeReady(int mode) {</span><span class="l">        return isCbtMode(mode) ? cbt != null : bst != null;</span><span class="l">    }</span><span class="l"> </span><span class="l">    /** Average time (seconds) per search over all samples. Keys are the names of data[samples[i]]. */</span><span class="l">    private double timeSearch(int mode) {</span><span class="l">        String[] keys = new String[samples.length];</span><span class="l">        for (int i = 0; i &lt; samples.length; i++) {</span><span class="l">            keys[i] = data[samples[i]].getName();</span><span class="l">        }</span><span class="l"> </span><span class="l">        int found = 0;</span><span class="l">        long start = System.nanoTime();</span><span class="l">        for (String key : keys) {</span><span class="l">            DefaultMutableTreeNode result = null;</span><span class="l">            switch (mode) {</span><span class="l">                case CBT_DFS:</span><span class="l">                    result = cbt.depthFirstSearch(key);</span><span class="l">                    break;</span><span class="l">                case CBT_BFS:</span><span class="l">                    result = cbt.breadthFirstSearch(key);</span><span class="l">                    break;</span><span class="l">                case BST_DFS:</span><span class="l">                    result = bst.depthFirstSearch(key);</span><span class="l">                    break;</span><span class="l">                case BST_BFS:</span><span class="l">                    result = bst.breadthFirstSearch(key);</span><span class="l">                    break;</span><span class="l">                case BST_BS:</span><span class="l">                    result = bst.binarySearch(key);</span><span class="l">                    break;</span><span class="l">                default:</span><span class="l">                    break;</span><span class="l">            }</span><span class="l">            if (result != null) {</span><span class="l">                found++;</span><span class="l">            }</span><span class="l">        }</span><span class="l">        double total = secondsSince(start);</span><span class="l">        lastFoundCount = found;</span><span class="l">        return total / keys.length;</span><span class="l">    }</span><span class="l"> </span><span class="l">    /** Shared by the 5 search buttons (items 7-11). */</span><span class="l">    private void runSearchButton(int mode) {</span><span class="l">        if (!requireData()) {</span><span class="l">            return;</span><span class="l">        }</span><span class="l">        if (samples == null) {</span><span class="l">            JOptionPane.showMessageDialog(this, &quot;Please press Gen Search Samples first.&quot;,</span><span class="l">                    &quot;No samples&quot;, JOptionPane.WARNING_MESSAGE);</span><span class="l">            return;</span><span class="l">        }</span><span class="l">        if (!treeReady(mode)) {</span><span class="l">            JOptionPane.showMessageDialog(this,</span><span class="l">                    &quot;Please press &quot; + (isCbtMode(mode) ? &quot;Gen CBT&quot; : &quot;Gen BST&quot;) + &quot; first.&quot;,</span><span class="l">                    &quot;No tree&quot;, JOptionPane.WARNING_MESSAGE);</span><span class="l">            return;</span><span class="l">        }</span><span class="l">        searchAvg[mode] = timeSearch(mode);</span><span class="l">        setStatus(String.format(Locale.US, &quot;%s: avg %.9f seconds (found %d/%d)&quot;,</span><span class="l">                MODE_NAMES[mode], searchAvg[mode], lastFoundCount, samples.length));</span><span class="l">    }</span><span class="l"> </span><span class="l">    /** Item 12: builds the report text. Only recorded or doable items are shown. */</span><span class="l">    private String buildReport() {</span><span class="l">        // Searches that can be done (tree + samples exist) but were not run yet are run now.</span><span class="l">        if (samples != null) {</span><span class="l">            for (int mode = 0; mode &lt; searchAvg.length; mode++) {</span><span class="l">                if (treeReady(mode) &amp;&amp; searchAvg[mode] == NOT_RECORDED) {</span><span class="l">                    searchAvg[mode] = timeSearch(mode);</span><span class="l">                }</span><span class="l">            }</span><span class="l">        }</span><span class="l"> </span><span class="l">        String eq = &quot;==================================================&quot;;</span><span class="l">        String dash = &quot;--------------------------------------------------&quot;;</span><span class="l">        StringBuilder sb = new StringBuilder();</span><span class="l">        sb.append(eq).append(&#x27;\n&#x27;);</span><span class="l">        sb.append(&quot;       PERFORMANCE REPORT SUMMARY&quot;).append(&#x27;\n&#x27;);</span><span class="l">        sb.append(&quot;       (Data Size = &quot;).append(data.length).append(&quot;)&quot;).append(&#x27;\n&#x27;);</span><span class="l">        sb.append(eq).append(&#x27;\n&#x27;);</span><span class="l"> </span><span class="l">        boolean hasBuild = cbtBuildTime != NOT_RECORDED || bstBuildTime != NOT_RECORDED;</span><span class="l">        if (cbtBuildTime != NOT_RECORDED) {</span><span class="l">            sb.append(String.format(Locale.US, &quot;CBT Construction Time : %.3f seconds%n&quot;, cbtBuildTime));</span><span class="l">        }</span><span class="l">        if (bstBuildTime != NOT_RECORDED) {</span><span class="l">            sb.append(String.format(Locale.US, &quot;BST Construction Time : %.3f seconds%n&quot;, bstBuildTime));</span><span class="l">        }</span><span class="l"> </span><span class="l">        boolean hasSearch = false;</span><span class="l">        for (double v : searchAvg) {</span><span class="l">            if (v != NOT_RECORDED) {</span><span class="l">                hasSearch = true;</span><span class="l">            }</span><span class="l">        }</span><span class="l">        if (hasSearch) {</span><span class="l">            if (hasBuild) {</span><span class="l">                sb.append(dash).append(&#x27;\n&#x27;);</span><span class="l">            }</span><span class="l">            sb.append(&quot;       (Sample Size = &quot;).append(samples.length).append(&quot;)&quot;).append(&#x27;\n&#x27;);</span><span class="l">            String[] labels = {&quot;CBT DFS Avg &quot;, &quot;CBT BFS Avg &quot;, &quot;BST DFS Avg &quot;, &quot;BST BFS Avg &quot;, &quot;BST BS  Avg &quot;};</span><span class="l">            for (int mode = 0; mode &lt; searchAvg.length; mode++) {</span><span class="l">                if (searchAvg[mode] != NOT_RECORDED) {</span><span class="l">                    sb.append(String.format(Locale.US, &quot;%s : %.9f seconds%n&quot;, labels[mode], searchAvg[mode]));</span><span class="l">                }</span><span class="l">            }</span><span class="l">        }</span><span class="l">        sb.append(eq).append(&#x27;\n&#x27;);</span><span class="l">        return sb.toString();</span><span class="l">    }</span><span class="l"> </span><span class="l">    /** @SuppressWarnings(&quot;unchecked&quot;) */</span><span class="l">    // &lt;editor-fold defaultstate=&quot;collapsed&quot; desc=&quot;Generated Code&quot;&gt;//GEN-BEGIN:initComponents</span><span class="l">    private void initComponents() {</span><span class="l"> </span><span class="l">        jLabel1 = new javax.swing.JLabel();</span><span class="l">        jTextField1 = new javax.swing.JTextField();</span><span class="l">        jButton1 = new javax.swing.JButton();</span><span class="l">        jLabel2 = new javax.swing.JLabel();</span><span class="l">        jTextField2 = new javax.swing.JTextField();</span><span class="l">        jButton2 = new javax.swing.JButton();</span><span class="l">        jLabel3 = new javax.swing.JLabel();</span><span class="l">        jTextField3 = new javax.swing.JTextField();</span><span class="l">        jButton3 = new javax.swing.JButton();</span><span class="l">        jLabel4 = new javax.swing.JLabel();</span><span class="l">        jTextField4 = new javax.swing.JTextField();</span><span class="l">        jButton4 = new javax.swing.JButton();</span><span class="l">        jButton5 = new javax.swing.JButton();</span><span class="l">        jButton6 = new javax.swing.JButton();</span><span class="l">        jButton7 = new javax.swing.JButton();</span><span class="l">        jButton8 = new javax.swing.JButton();</span><span class="l">        jButton9 = new javax.swing.JButton();</span><span class="l">        jButton10 = new javax.swing.JButton();</span><span class="l">        jScrollPane1 = new javax.swing.JScrollPane();</span><span class="l">        jTextArea1 = new javax.swing.JTextArea();</span><span class="l">        jLabel5 = new javax.swing.JLabel();</span><span class="l"> </span><span class="l">        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);</span><span class="l">        setTitle(&quot;MiniTest - CBT &amp; BST&#x27;s Performance&quot;);</span><span class="l"> </span><span class="l">        jLabel1.setText(&quot;Number of Products:&quot;);</span><span class="l"> </span><span class="l">        jTextField1.setText(&quot;100000&quot;);</span><span class="l"> </span><span class="l">        jButton1.setText(&quot;Gen Product&quot;);</span><span class="l">        jButton1.addActionListener(new java.awt.event.ActionListener() {</span><span class="l">            public void actionPerformed(java.awt.event.ActionEvent evt) {</span><span class="l">                jButton1ActionPerformed(evt);</span><span class="l">            }</span><span class="l">        });</span><span class="l"> </span><span class="l">        jLabel2.setText(&quot;Number of Samples:&quot;);</span><span class="l"> </span><span class="l">        jTextField2.setText(&quot;100&quot;);</span><span class="l"> </span><span class="l">        jButton2.setText(&quot;Gen Search Samples&quot;);</span><span class="l">        jButton2.addActionListener(new java.awt.event.ActionListener() {</span><span class="l">            public void actionPerformed(java.awt.event.ActionEvent evt) {</span><span class="l">                jButton2ActionPerformed(evt);</span><span class="l">            }</span><span class="l">        });</span><span class="l"> </span><span class="l">        jLabel3.setText(&quot;CBT Height (levels):&quot;);</span><span class="l"> </span><span class="l">        jTextField3.setEditable(false);</span><span class="l"> </span><span class="l">        jButton3.setText(&quot;Gen CBT&quot;);</span><span class="l">        jButton3.addActionListener(new java.awt.event.ActionListener() {</span><span class="l">            public void actionPerformed(java.awt.event.ActionEvent evt) {</span><span class="l">                jButton3ActionPerformed(evt);</span><span class="l">            }</span><span class="l">        });</span><span class="l"> </span><span class="l">        jLabel4.setText(&quot;BST Height (levels):&quot;);</span><span class="l"> </span><span class="l">        jTextField4.setEditable(false);</span><span class="l"> </span><span class="l">        jButton4.setText(&quot;Gen BST&quot;);</span><span class="l">        jButton4.addActionListener(new java.awt.event.ActionListener() {</span><span class="l">            public void actionPerformed(java.awt.event.ActionEvent evt) {</span><span class="l">                jButton4ActionPerformed(evt);</span><span class="l">            }</span><span class="l">        });</span><span class="l"> </span><span class="l">        jButton5.setText(&quot;CBT DFS&quot;);</span><span class="l">        jButton5.addActionListener(new java.awt.event.ActionListener() {</span><span class="l">            public void actionPerformed(java.awt.event.ActionEvent evt) {</span><span class="l">                jButton5ActionPerformed(evt);</span><span class="l">            }</span><span class="l">        });</span><span class="l"> </span><span class="l">        jButton6.setText(&quot;CBT BFS&quot;);</span><span class="l">        jButton6.addActionListener(new java.awt.event.ActionListener() {</span><span class="l">            public void actionPerformed(java.awt.event.ActionEvent evt) {</span><span class="l">                jButton6ActionPerformed(evt);</span><span class="l">            }</span><span class="l">        });</span><span class="l"> </span><span class="l">        jButton7.setText(&quot;BST DFS&quot;);</span><span class="l">        jButton7.addActionListener(new java.awt.event.ActionListener() {</span><span class="l">            public void actionPerformed(java.awt.event.ActionEvent evt) {</span><span class="l">                jButton7ActionPerformed(evt);</span><span class="l">            }</span><span class="l">        });</span><span class="l"> </span><span class="l">        jButton8.setText(&quot;BST BFS&quot;);</span><span class="l">        jButton8.addActionListener(new java.awt.event.ActionListener() {</span><span class="l">            public void actionPerformed(java.awt.event.ActionEvent evt) {</span><span class="l">                jButton8ActionPerformed(evt);</span><span class="l">            }</span><span class="l">        });</span><span class="l"> </span><span class="l">        jButton9.setText(&quot;BST BS&quot;);</span><span class="l">        jButton9.addActionListener(new java.awt.event.ActionListener() {</span><span class="l">            public void actionPerformed(java.awt.event.ActionEvent evt) {</span><span class="l">                jButton9ActionPerformed(evt);</span><span class="l">            }</span><span class="l">        });</span><span class="l"> </span><span class="l">        jButton10.setText(&quot;Report Sumary&quot;);</span><span class="l">        jButton10.addActionListener(new java.awt.event.ActionListener() {</span><span class="l">            public void actionPerformed(java.awt.event.ActionEvent evt) {</span><span class="l">                jButton10ActionPerformed(evt);</span><span class="l">            }</span><span class="l">        });</span><span class="l"> </span><span class="l">        jTextArea1.setEditable(false);</span><span class="l">        jTextArea1.setColumns(55);</span><span class="l">        jTextArea1.setFont(new java.awt.Font(&quot;Monospaced&quot;, 0, 13)); // NOI18N</span><span class="l">        jTextArea1.setRows(14);</span><span class="l">        jScrollPane1.setViewportView(jTextArea1);</span><span class="l"> </span><span class="l">        jLabel5.setText(&quot; &quot;);</span><span class="l"> </span><span class="l">        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());</span><span class="l">        getContentPane().setLayout(layout);</span><span class="l">        layout.setHorizontalGroup(</span><span class="l">            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)</span><span class="l">            .addGroup(layout.createSequentialGroup()</span><span class="l">                .addContainerGap()</span><span class="l">                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)</span><span class="l">                    .addComponent(jScrollPane1)</span><span class="l">                    .addGroup(layout.createSequentialGroup()</span><span class="l">                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)</span><span class="l">                            .addComponent(jLabel1)</span><span class="l">                            .addComponent(jLabel2)</span><span class="l">                            .addComponent(jLabel3)</span><span class="l">                            .addComponent(jLabel4))</span><span class="l">                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)</span><span class="l">                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)</span><span class="l">                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)</span><span class="l">                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)</span><span class="l">                            .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)</span><span class="l">                            .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))</span><span class="l">                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)</span><span class="l">                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)</span><span class="l">                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)</span><span class="l">                            .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)</span><span class="l">                            .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)</span><span class="l">                            .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)))</span><span class="l">                    .addGroup(layout.createSequentialGroup()</span><span class="l">                        .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)</span><span class="l">                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)</span><span class="l">                        .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)</span><span class="l">                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)</span><span class="l">                        .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)</span><span class="l">                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)</span><span class="l">                        .addComponent(jButton8, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)</span><span class="l">                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)</span><span class="l">                        .addComponent(jButton9, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))</span><span class="l">                    .addComponent(jButton10)</span><span class="l">                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))</span><span class="l">                .addContainerGap())</span><span class="l">        );</span><span class="l">        layout.setVerticalGroup(</span><span class="l">            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)</span><span class="l">            .addGroup(layout.createSequentialGroup()</span><span class="l">                .addContainerGap()</span><span class="l">                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)</span><span class="l">                    .addComponent(jLabel1)</span><span class="l">                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)</span><span class="l">                    .addComponent(jButton1))</span><span class="l">                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)</span><span class="l">                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)</span><span class="l">                    .addComponent(jLabel2)</span><span class="l">                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)</span><span class="l">                    .addComponent(jButton2))</span><span class="l">                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)</span><span class="l">                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)</span><span class="l">                    .addComponent(jLabel3)</span><span class="l">                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)</span><span class="l">                    .addComponent(jButton3))</span><span class="l">                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)</span><span class="l">                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)</span><span class="l">                    .addComponent(jLabel4)</span><span class="l">                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)</span><span class="l">                    .addComponent(jButton4))</span><span class="l">                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)</span><span class="l">                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)</span><span class="l">                    .addComponent(jButton5)</span><span class="l">                    .addComponent(jButton6)</span><span class="l">                    .addComponent(jButton7)</span><span class="l">                    .addComponent(jButton8)</span><span class="l">                    .addComponent(jButton9))</span><span class="l">                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)</span><span class="l">                .addComponent(jButton10)</span><span class="l">                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)</span><span class="l">                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE)</span><span class="l">                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)</span><span class="l">                .addComponent(jLabel5)</span><span class="l">                .addContainerGap())</span><span class="l">        );</span><span class="l"> </span><span class="l">        pack();</span><span class="l">        setLocationRelativeTo(null);</span><span class="l">    }// &lt;/editor-fold&gt;//GEN-END:initComponents</span><span class="l"> </span><span class="l">    // Item 2: Gen Product</span><span class="l">    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed</span><span class="l">        int n = readPositiveInt(jTextField1, &quot;the number of products&quot;);</span><span class="l">        if (n &lt; 0) {</span><span class="l">            return;</span><span class="l">        }</span><span class="l">        data = new Product[n];</span><span class="l">        for (int i = 0; i &lt; n; i++) {</span><span class="l">            data[i] = Product.random(random);</span><span class="l">        }</span><span class="l">        // Everything built from the old data is now stale</span><span class="l">        samples = null;</span><span class="l">        cbt = null;</span><span class="l">        bst = null;</span><span class="l">        cbtBuildTime = NOT_RECORDED;</span><span class="l">        bstBuildTime = NOT_RECORDED;</span><span class="l">        clearSearchTimes();</span><span class="l">        jTextField3.setText(&quot;&quot;);</span><span class="l">        jTextField4.setText(&quot;&quot;);</span><span class="l">        jTextArea1.setText(&quot;&quot;);</span><span class="l">        setStatus(&quot;Generated &quot; + n + &quot; products into data[].&quot;);</span><span class="l">    }//GEN-LAST:event_jButton1ActionPerformed</span><span class="l"> </span><span class="l">    // Item 3: Gen Search Samples</span><span class="l">    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed</span><span class="l">        if (!requireData()) {</span><span class="l">            return;</span><span class="l">        }</span><span class="l">        int k = readPositiveInt(jTextField2, &quot;the number of samples&quot;);</span><span class="l">        if (k &lt; 0) {</span><span class="l">            return;</span><span class="l">        }</span><span class="l">        samples = new int[k];</span><span class="l">        for (int i = 0; i &lt; k; i++) {</span><span class="l">            samples[i] = random.nextInt(data.length);</span><span class="l">        }</span><span class="l">        clearSearchTimes();</span><span class="l">        setStatus(&quot;Generated &quot; + k + &quot; random search indexes into samples[].&quot;);</span><span class="l">    }//GEN-LAST:event_jButton2ActionPerformed</span><span class="l"> </span><span class="l">    // Item 5: Gen CBT</span><span class="l">    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed</span><span class="l">        if (!requireData()) {</span><span class="l">            return;</span><span class="l">        }</span><span class="l">        cbt = new CBT();</span><span class="l">        long start = System.nanoTime();</span><span class="l">        for (int i = 0; i &lt; data.length; i++) {</span><span class="l">            cbt.addNode(new DefaultMutableTreeNode(data[i]));</span><span class="l">        }</span><span class="l">        cbtBuildTime = secondsSince(start);</span><span class="l">        jTextField3.setText(String.valueOf(cbt.getHeight()));</span><span class="l">        searchAvg[CBT_DFS] = NOT_RECORDED;</span><span class="l">        searchAvg[CBT_BFS] = NOT_RECORDED;</span><span class="l">        setStatus(String.format(Locale.US, &quot;CBT built in %.3f seconds.&quot;, cbtBuildTime));</span><span class="l">    }//GEN-LAST:event_jButton3ActionPerformed</span><span class="l"> </span><span class="l">    // Item 6: Gen BST (ordered by name)</span><span class="l">    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed</span><span class="l">        if (!requireData()) {</span><span class="l">            return;</span><span class="l">        }</span><span class="l">        bst = new BST();</span><span class="l">        long start = System.nanoTime();</span><span class="l">        for (int i = 0; i &lt; data.length; i++) {</span><span class="l">            bst.addNode(new DefaultMutableTreeNode(data[i]));</span><span class="l">        }</span><span class="l">        bstBuildTime = secondsSince(start);</span><span class="l">        jTextField4.setText(String.valueOf(bst.getHeight()));</span><span class="l">        searchAvg[BST_DFS] = NOT_RECORDED;</span><span class="l">        searchAvg[BST_BFS] = NOT_RECORDED;</span><span class="l">        searchAvg[BST_BS] = NOT_RECORDED;</span><span class="l">        setStatus(String.format(Locale.US, &quot;BST built in %.3f seconds.&quot;, bstBuildTime));</span><span class="l">    }//GEN-LAST:event_jButton4ActionPerformed</span><span class="l"> </span><span class="l">    // Item 7: CBT DFS</span><span class="l">    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed</span><span class="l">        runSearchButton(CBT_DFS);</span><span class="l">    }//GEN-LAST:event_jButton5ActionPerformed</span><span class="l"> </span><span class="l">    // Item 8: CBT BFS</span><span class="l">    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed</span><span class="l">        runSearchButton(CBT_BFS);</span><span class="l">    }//GEN-LAST:event_jButton6ActionPerformed</span><span class="l"> </span><span class="l">    // Item 9: BST DFS</span><span class="l">    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed</span><span class="l">        runSearchButton(BST_DFS);</span><span class="l">    }//GEN-LAST:event_jButton7ActionPerformed</span><span class="l"> </span><span class="l">    // Item 10: BST BFS</span><span class="l">    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed</span><span class="l">        runSearchButton(BST_BFS);</span><span class="l">    }//GEN-LAST:event_jButton8ActionPerformed</span><span class="l"> </span><span class="l">    // Item 11: BST BS</span><span class="l">    private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed</span><span class="l">        runSearchButton(BST_BS);</span><span class="l">    }//GEN-LAST:event_jButton9ActionPerformed</span><span class="l"> </span><span class="l">    // Item 12: Report Sumary</span><span class="l">    private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed</span><span class="l">        if (data == null) {</span><span class="l">            jTextArea1.setText(&quot;No data yet. Please press Gen Product first.&quot;);</span><span class="l">            return;</span><span class="l">        }</span><span class="l">        jTextArea1.setText(buildReport());</span><span class="l">        jTextArea1.setCaretPosition(0);</span><span class="l">    }//GEN-LAST:event_jButton10ActionPerformed</span><span class="l"> </span><span class="l">    /**</span><span class="l">     * @param args the command line arguments</span><span class="l">     */</span><span class="l">    public static void main(String args[]) {</span><span class="l">        /* Set the Nimbus look and feel */</span><span class="l">        //&lt;editor-fold defaultstate=&quot;collapsed&quot; desc=&quot; Look and feel setting code (optional) &quot;&gt;</span><span class="l">        try {</span><span class="l">            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {</span><span class="l">                if (&quot;Nimbus&quot;.equals(info.getName())) {</span><span class="l">                    javax.swing.UIManager.setLookAndFeel(info.getClassName());</span><span class="l">                    break;</span><span class="l">                }</span><span class="l">            }</span><span class="l">        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {</span><span class="l">            java.util.logging.Logger.getLogger(MiniTest.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);</span><span class="l">        }</span><span class="l">        //&lt;/editor-fold&gt;</span><span class="l"> </span><span class="l">        /* Create and display the form */</span><span class="l">        java.awt.EventQueue.invokeLater(new Runnable() {</span><span class="l">            public void run() {</span><span class="l">                new MiniTest().setVisible(true);</span><span class="l">            }</span><span class="l">        });</span><span class="l">    }</span><span class="l"> </span><span class="l">    // Variables declaration - do not modify//GEN-BEGIN:variables</span><span class="l">    private javax.swing.JButton jButton1;</span><span class="l">    private javax.swing.JButton jButton10;</span><span class="l">    private javax.swing.JButton jButton2;</span><span class="l">    private javax.swing.JButton jButton3;</span><span class="l">    private javax.swing.JButton jButton4;</span><span class="l">    private javax.swing.JButton jButton5;</span><span class="l">    private javax.swing.JButton jButton6;</span><span class="l">    private javax.swing.JButton jButton7;</span><span class="l">    private javax.swing.JButton jButton8;</span><span class="l">    private javax.swing.JButton jButton9;</span><span class="l">    private javax.swing.JLabel jLabel1;</span><span class="l">    private javax.swing.JLabel jLabel2;</span><span class="l">    private javax.swing.JLabel jLabel3;</span><span class="l">    private javax.swing.JLabel jLabel4;</span><span class="l">    private javax.swing.JLabel jLabel5;</span><span class="l">    private javax.swing.JScrollPane jScrollPane1;</span><span class="l">    private javax.swing.JTextArea jTextArea1;</span><span class="l">    private javax.swing.JTextField jTextField1;</span><span class="l">    private javax.swing.JTextField jTextField2;</span><span class="l">    private javax.swing.JTextField jTextField3;</span><span class="l">    private javax.swing.JTextField jTextField4;</span><span class="l">    // End of variables declaration//GEN-END:variables</span><span class="l">}</span></div>
+
+<footer>เอกสารประกอบโปรเจกต์ MiniTest — เวลาที่แสดงในตัวอย่างมาจากการรันทดสอบ ค่าบนเครื่องของคุณจะต่างออกไป</footer>
+</main>
+</div>
+<script>
+(function(){
+var side=document.getElementById('side');
+document.getElementById('menu').onclick=function(){side.classList.toggle('open')};
+side.addEventListener('click',function(e){if(e.target.tagName==='A')side.classList.remove('open')});
+var root=document.documentElement;
+try{var t=localStorage.getItem('theme');if(t)root.setAttribute('data-theme',t)}catch(e){}
+document.getElementById('theme').onclick=function(){
+  var dark=root.getAttribute('data-theme')?root.getAttribute('data-theme')==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+  var n=dark?'light':'dark';root.setAttribute('data-theme',n);try{localStorage.setItem('theme',n)}catch(e){}
+};
+var links=[].slice.call(side.querySelectorAll('a'));
+var heads=links.map(function(a){return document.getElementById(a.getAttribute('href').slice(1))});
+function spy(){var y=window.scrollY+110,cur=0;heads.forEach(function(h,i){if(h&&h.offsetTop<=y)cur=i});
+  links.forEach(function(a,i){a.classList.toggle('on',i===cur)})}
+addEventListener('scroll',spy,{passive:true});spy();
+var cb=document.getElementById('copy');
+cb.onclick=function(){
+  var txt=[].map.call(document.querySelectorAll('#codebox .l'),function(l){return l.textContent}).join('\n');
+  var done=function(){cb.textContent='คัดลอกแล้ว ✓';setTimeout(function(){cb.textContent='คัดลอกโค้ดทั้งหมด'},1800)};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(done,function(){alert('คัดลอกไม่สำเร็จ ลองดาวน์โหลดไฟล์แทน')})}
+  else{alert('เบราว์เซอร์นี้คัดลอกอัตโนมัติไม่ได้ ลองดาวน์โหลดไฟล์แทน')}
+};
+})();
+</script>
+</body>
+</html>
